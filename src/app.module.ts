@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { WeatherModule } from 'src/infrastructure/weather/weather.module';
+import { WeatherModule } from './infrastructure/weather/weather.module';
+import { SubscriptionModule } from './modules/subscription/subscription.module';
 
 @Module({
   imports: [
@@ -8,6 +9,7 @@ import { WeatherModule } from 'src/infrastructure/weather/weather.module';
       isGlobal: true,
     }),
     WeatherModule,
+    SubscriptionModule,
   ],
   controllers: [],
   providers: [],
