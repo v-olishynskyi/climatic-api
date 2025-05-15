@@ -1,20 +1,21 @@
-# Use the official Node.js image as the base image
+# ===== Базовий імідж =====
 FROM node:20-alpine
 
-# Set the working directory inside the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
-
-# Install the application dependencies
 RUN npm install
 
-# Copy the rest of the application files
 COPY . .
 
-# Expose the application port
-EXPOSE 3000
+# Якщо ENV = production — запускаємо компіляцію
+ARG NODE_ENV=development
+ENV NODE_ENV=${NODE_ENV}
 
-# Command to run the application
-CMD ["npm", "run", "start:dev"]
+RUN if [ "$NODE_ENV" = "production" ]; then npm run build; fi
+
+CMD if [ "$NODE_ENV" = "production" ]; then node dist/main.js; else npm run start:dev; fi
+
+# TODO: Залишити тільки те, що потрібно для продакшена
+RUN mkdir -p dist/infrastructure/mail/templates && \
+    cp src/infrastructure/mail/templates/*.hbs dist/infrastructure/mail/templates/

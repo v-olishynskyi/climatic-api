@@ -1,6 +1,6 @@
 # Запускає контейнер
 up:
-	docker-compose up
+	docker-compose up --build
 
 # Зупиняє всі сервіси
 down:

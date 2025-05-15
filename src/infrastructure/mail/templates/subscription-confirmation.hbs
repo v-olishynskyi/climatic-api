@@ -1,0 +1,81 @@
+<html lang='uk'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Підтвердження підписки</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f7;
+        padding: 20px;
+        color: #333;
+      }
+      .container {
+        max-width: 600px;
+        margin: auto;
+        background-color: #ffffff;
+        border-radius: 6px;
+        padding: 30px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+      }
+      .header {
+        text-align: center;
+        padding-bottom: 20px;
+      }
+      .header h1 {
+        color: #2e7d32;
+      }
+      .content {
+        font-size: 16px;
+        line-height: 1.6;
+      }
+      .button {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 12px 20px;
+        background-color: #2e7d32;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 4px;
+      }
+      .footer {
+        margin-top: 30px;
+        font-size: 13px;
+        color: #999;
+        text-align: center;
+      }
+      .link {
+        margin-top: 10px;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class='container'>
+      <div class='header'>
+        <h1>Підтвердіть підписку</h1>
+      </div>
+      <div class='content'>
+        <p>Ви підписалися на оновлення погоди для міста
+          <strong>{{city}}</strong>.</p>
+        <p>Щоб завершити підписку, натисніть кнопку нижче:</p>
+
+        <p style='text-align: center;'>
+          <a class='button' href='{{confirmUrl}}' target='_blank'>Підтвердити
+            підписку</a>
+        </p>
+
+        <p class='link'>
+          Або скопіюйте посилання в браузер:<br />
+          <a href='{{confirmUrl}}'>{{confirmUrl}}</a>
+        </p>
+
+        <p>Дякуємо, що користуєтесь нашим сервісом!</p>
+      </div>
+      <div class='footer'>
+        &copy; 2025 Weather Updates | Якщо ви не підписувалися — просто
+        ігноруйте цей лист.
+      </div>
+    </div>
+  </body>
+</html>

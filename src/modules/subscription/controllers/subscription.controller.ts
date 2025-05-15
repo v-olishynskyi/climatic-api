@@ -1,6 +1,8 @@
 import {
   Body,
   Controller,
+  Get,
+  Param,
   Post,
   UseInterceptors,
   UsePipes,
@@ -12,12 +14,13 @@ import {
   ApiBody,
   ApiConflictResponse,
   ApiConsumes,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
 } from '@nestjs/swagger';
 import { SubscribeWeatherUpdatesDto } from '../dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
-
 @Controller('')
 export class SubscriptionController {
   constructor(private readonly subscriptionService: SubscriptionService) {}
@@ -34,18 +37,68 @@ export class SubscriptionController {
   })
   @ApiOkResponse({
     type: String,
-    example: 'Subscription successful. Confirmation email sent.',
+    description: 'Subscription successful. Confirmation email sent.',
   })
-  @ApiBadRequestResponse({ type: String, example: 'Invalid input' })
-  @ApiConflictResponse({ type: String, example: 'Email already subscribed' })
-  @Post('/subscribe')
+  @ApiBadRequestResponse({ type: String, description: 'Invalid input' })
+  @ApiConflictResponse({
+    type: String,
+    description: 'Email already subscribed',
+  })
   @UseInterceptors(FileFieldsInterceptor([]))
   @UsePipes(new ValidationPipe({ transform: true }))
-  subscribeToWeatherUpdates(
+  @Post('/subscribe')
+  async subscribeToWeatherUpdates(
     @Body() subscribeWeatherUpdatesDto: SubscribeWeatherUpdatesDto,
   ): Promise<string> {
-    return this.subscriptionService.subscribeToWeatherUpdates(
+    await this.subscriptionService.subscribeToWeatherUpdates(
       subscribeWeatherUpdatesDto,
     );
+
+    return 'Subscription successful. Confirmation email sent.';
+  }
+
+  @ApiOperation({
+    summary: 'Confirm email subscription',
+    description:
+      'Confirms a subscription using the token sent in the confirmation email.',
+  })
+  @ApiOkResponse({
+    type: String,
+    description: 'Subscription confirmed successfully',
+  })
+  @ApiBadRequestResponse({ type: String, description: 'Invalid token' })
+  @ApiNotFoundResponse({
+    type: String,
+    description: 'Token not found',
+  })
+  @ApiParam({
+    name: 'token',
+    description: 'Confirmation token',
+  })
+  @Get('/confirm/:token')
+  confirmSubscription(@Param('token') token: string): string {
+    console.log('token', token);
+
+    return token;
+  }
+
+  @ApiOperation({
+    summary: 'Unsubscribe from weather updates',
+    description:
+      'Unsubscribes an email from weather updates using the token sent in emails.',
+  })
+  @ApiOkResponse({
+    type: String,
+    description: 'Unsubscribed successfully',
+  })
+  @ApiBadRequestResponse({ type: String, description: 'Invalid token' })
+  @ApiNotFoundResponse({
+    type: String,
+    description: 'Token not found',
+  })
+  @Get('/unsubscribe/:token')
+  unsubscribeFromWeatherUpdates(@Param('token') token: string): string {
+    console.log('token', token);
+    return token;
   }
 }

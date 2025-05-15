@@ -1,17 +1,29 @@
 import { Injectable } from '@nestjs/common';
 import { SubscribeWeatherUpdatesDto } from '../dto';
 import { WeatherService } from '../../../infrastructure/weather/services/weather.service';
+import { MailService } from '../../../infrastructure/mail/services/mail.service';
 
 @Injectable()
 export class SubscriptionService {
-  constructor(private readonly weatherService: WeatherService) {}
+  constructor(
+    private readonly weatherService: WeatherService,
+    private readonly mailService: MailService,
+  ) {}
 
   async subscribeToWeatherUpdates(inputDto: SubscribeWeatherUpdatesDto) {
     // first we need to check if city is correct
     await this.weatherService.getWeather(inputDto.city);
 
-    // if city is correct, we can send email with confirmation link to the weather updates
+    const token = 'lorem-ipsum-token'; // TODO: generate token
 
-    return JSON.stringify(inputDto);
+    await this.mailService.sendEmail({
+      template: 'subscription-confirmation',
+      to: inputDto.email,
+      subject: 'Weather updates subscription confirmation',
+      context: {
+        city: inputDto.city,
+        confirmUrl: `http://localhost:3000/confirm/${token}`,
+      },
+    });
   }
 }
