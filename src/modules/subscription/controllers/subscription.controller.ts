@@ -74,9 +74,11 @@ export class SubscriptionController {
   @ApiParam({
     name: 'token',
     description: 'Confirmation token',
+    required: true,
+    type: String,
   })
   @Get('/confirm/:token')
-  confirmSubscription(@Param('token') token: string): string {
+  confirmSubscription(@Param('token') token: string): Promise<string> {
     return this.subscriptionService.confirmSubscription(token);
   }
 

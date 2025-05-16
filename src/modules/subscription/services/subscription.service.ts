@@ -1,25 +1,39 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { SubscribeWeatherUpdatesDto } from '../dto';
 import { WeatherService } from '../../../infrastructure/weather/services/weather.service';
 import { MailService } from '../../../infrastructure/mail/services/mail.service';
 import { CronService } from '../../../infrastructure/schedulers/services/cron.service';
 import { JwtTokenService } from '../../../shared/services/jwt.service';
+import { WeatherSchedulerService } from '../../../infrastructure/schedulers/services/weather-scheduler.service';
 
+const tokens: Array<any> = [];
+
+type JWTPayload = Record<string, unknown>;
 @Injectable()
 export class SubscriptionService {
+  private readonly logger = new Logger(SubscriptionService.name);
+
   constructor(
     private readonly weatherService: WeatherService,
     private readonly mailService: MailService,
     private readonly cronService: CronService,
     private readonly jwtTokenService: JwtTokenService,
+    private readonly weatherScheduler: WeatherSchedulerService,
   ) {}
 
   async subscribeToWeatherUpdates(inputDto: SubscribeWeatherUpdatesDto) {
     // first we need to check if city is correct
     await this.weatherService.getWeather(inputDto.city);
 
-    const payload = {
+    const payload: JWTPayload = {
       sub: inputDto.email,
+      city: inputDto.city,
+      frequency: inputDto.frequency,
     };
 
     const token = await this.jwtTokenService.signAsync(payload, {
@@ -38,17 +52,44 @@ export class SubscriptionService {
       },
     });
 
+    this.logger.log(`Confirmation email sent to ${inputDto.email}`);
+
     // store the token on db
+    tokens.push(token);
   }
 
-  confirmSubscription(token: string) {
-    this.cronService.createCronTask(
+  async confirmSubscription(token: string) {
+    // check if token is exists in the db
+    const tokenIndex = tokens.findIndex((t) => t === token);
+    const isTokenExist = tokenIndex !== -1;
+
+    if (!isTokenExist) {
+      throw new NotFoundException('Token not found');
+    }
+
+    // check if token is valid
+    const tokenPayload =
+      await this.jwtTokenService.verifyAsync<JWTPayload>(token);
+
+    if (!tokenPayload) {
+      throw new ForbiddenException('Token is expired');
+    }
+
+    this.cronService.createAndStartCronTask(
       token,
-      () => {
-        console.log('asdasdasdaa');
-      },
-      '5 * * * *',
+      () =>
+        this.weatherScheduler.scheduleWeatherUpdate(
+          tokenPayload.city as string,
+          tokenPayload.sub as string,
+        ),
+      '30 * * * * *',
+      // tokenPayload.frequency,
     );
+
+    this.logger.log(`Cron job created for ${tokenPayload.sub as string}`);
+
+    // remove token from db
+    tokens.splice(tokenIndex, 1);
 
     return 'Subscription confirmed successfully';
   }

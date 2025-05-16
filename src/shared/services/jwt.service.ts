@@ -18,7 +18,7 @@ export class JwtTokenService {
     return secret;
   }
 
-  async signAsync(
+  signAsync(
     payload: Record<string, unknown>,
     options?: Omit<JwtSignOptions, keyof SigningOptions>,
   ): Promise<string> {
@@ -38,15 +38,18 @@ export class JwtTokenService {
     });
   }
 
-  async verifyAsync(token: string, options?: JwtVerifyOptions): Promise<any> {
-    return this.jwtService.verifyAsync(token, {
+  verifyAsync<T extends object>(
+    token: string,
+    options?: JwtVerifyOptions,
+  ): Promise<T> {
+    return this.jwtService.verifyAsync<T>(token, {
       secret: this.getSecret(),
       ...options,
     });
   }
 
-  verify(token: string, options?: JwtVerifyOptions): Promise<any> {
-    return this.jwtService.verify(token, {
+  verify<T extends object>(token: string, options?: JwtVerifyOptions): T {
+    return this.jwtService.verify<T>(token, {
       secret: this.getSecret(),
       ...options,
     });

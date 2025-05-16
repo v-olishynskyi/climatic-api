@@ -7,6 +7,7 @@ import { MailService } from '../../infrastructure/mail/services/mail.service';
 import { CronService } from '../../infrastructure/schedulers/services/cron.service';
 import { JwtTokenService } from '../../shared/services/jwt.service';
 import { JwtTokenModule } from '../../shared/modules/jwt.module';
+import { WeatherSchedulerService } from '../../infrastructure/schedulers/services/weather-scheduler.service';
 
 @Module({
   imports: [HttpModule, JwtTokenModule],
@@ -17,6 +18,7 @@ import { JwtTokenModule } from '../../shared/modules/jwt.module';
     MailService,
     CronService,
     JwtTokenService,
+    WeatherSchedulerService,
   ],
 })
 export class SubscriptionModule {}
