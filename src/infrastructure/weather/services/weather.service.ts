@@ -25,7 +25,7 @@ export class WeatherService {
       // TODO: add url builder
       const { data } = await firstValueFrom(
         this.httpService.get<WeatherApiResponseDto>(
-          `https://api.weatherapi.com/v1/current.json?q=${city}&key=480a8c6e7bcb4380a8d123007251405`,
+          `https://api.weatherapi.com/v1/current.json?q=${city}&key=${this.configService.get('WEATHER_API_KEY')}`,
         ),
       );
 

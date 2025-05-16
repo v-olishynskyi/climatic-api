@@ -29,6 +29,7 @@ export class SubscriptionService {
   async subscribeToWeatherUpdates(inputDto: SubscribeWeatherUpdatesDto) {
     // first we need to check if city is correct
     await this.weatherService.getWeather(inputDto.city);
+    this.logger.log(`City is correct: ${inputDto.city}}`);
 
     const payload: JWTPayload = {
       sub: inputDto.email,
@@ -64,30 +65,35 @@ export class SubscriptionService {
     const isTokenExist = tokenIndex !== -1;
 
     if (!isTokenExist) {
+      this.logger.error(`Token not found: ${token}`);
       throw new NotFoundException('Token not found');
     }
 
-    // check if token is valid
-    const tokenPayload =
-      await this.jwtTokenService.verifyAsync<JWTPayload>(token);
+    try {
+      // check if token is valid
+      const tokenPayload =
+        await this.jwtTokenService.verifyAsync<JWTPayload>(token);
 
-    if (!tokenPayload) {
-      throw new ForbiddenException('Token is expired');
+      this.logger.log(`Token payload: ${JSON.stringify(tokenPayload)}`);
+
+      this.cronService.createAndStartCronTask(
+        token,
+        () =>
+          this.weatherScheduler.scheduleWeatherUpdate(
+            tokenPayload.city as string,
+            tokenPayload.sub as string,
+          ),
+        '30 * * * * *',
+        // tokenPayload.frequency,
+      );
+
+      this.logger.log(`Cron job created for ${tokenPayload.sub as string}`);
+    } catch (error) {
+      this.logger.error(`Token verification error: ${error}`);
+      // remove token from db
+      tokens.splice(tokenIndex, 1);
+      throw new ForbiddenException('Token is invalid');
     }
-
-    this.cronService.createAndStartCronTask(
-      token,
-      () =>
-        this.weatherScheduler.scheduleWeatherUpdate(
-          tokenPayload.city as string,
-          tokenPayload.sub as string,
-        ),
-      '30 * * * * *',
-      // tokenPayload.frequency,
-    );
-
-    this.logger.log(`Cron job created for ${tokenPayload.sub as string}`);
-
     // remove token from db
     tokens.splice(tokenIndex, 1);
 

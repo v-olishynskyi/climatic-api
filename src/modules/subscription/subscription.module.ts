@@ -6,7 +6,7 @@ import { WeatherService } from '../../infrastructure/weather/services/weather.se
 import { MailService } from '../../infrastructure/mail/services/mail.service';
 import { CronService } from '../../infrastructure/schedulers/services/cron.service';
 import { JwtTokenService } from '../../shared/services/jwt.service';
-import { JwtTokenModule } from '../../shared/modules/jwt.module';
+import { JwtTokenModule } from '../../shared/infrastructure/jwt.module';
 import { WeatherSchedulerService } from '../../infrastructure/schedulers/services/weather-scheduler.service';
 
 @Module({
