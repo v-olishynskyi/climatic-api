@@ -3,6 +3,8 @@ import { MailService } from './services/mail.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { join } from 'path';
+import * as Handlebars from 'handlebars';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 const templatesDir =
   process.env.NODE_ENV === 'production'
@@ -12,17 +14,19 @@ const templatesDir =
 @Module({
   imports: [
     MailerModule.forRootAsync({
-      useFactory: () => ({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
         transport: {
-          host: process.env.MAIL_HOST,
-          port: Number(process.env.MAIL_PORT),
+          host: configService.get('MAIL_HOST'),
+          port: configService.get('MAIL_PORT'),
           auth: {
-            user: process.env.MAIL_USER,
-            pass: process.env.MAIL_PASS,
+            user: configService.get('MAIL_USER'),
+            pass: configService.get('MAIL_PASS'),
           },
         },
         defaults: {
-          from: `"Climatic" <${process.env.MAIL_FROM}>`,
+          from: `"Climatic" <${configService.get('MAIL_FROM')}>`,
         },
         template: {
           dir: templatesDir,
@@ -38,4 +42,9 @@ const templatesDir =
   providers: [MailService],
   exports: [MailService],
 })
-export class MailModule {}
+export class MailModule {
+  constructor() {
+    // Register Handlebars helpers
+    Handlebars.registerHelper('eq', (a, b) => a === b);
+  }
+}

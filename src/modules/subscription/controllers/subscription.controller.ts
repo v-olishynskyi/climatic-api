@@ -77,9 +77,7 @@ export class SubscriptionController {
   })
   @Get('/confirm/:token')
   confirmSubscription(@Param('token') token: string): string {
-    console.log('token', token);
-
-    return token;
+    return this.subscriptionService.confirmSubscription(token);
   }
 
   @ApiOperation({

@@ -4,10 +4,19 @@ import { SubscriptionService } from './services/subscription.service';
 import { SubscriptionController } from './controllers/subscription.controller';
 import { WeatherService } from '../../infrastructure/weather/services/weather.service';
 import { MailService } from '../../infrastructure/mail/services/mail.service';
+import { CronService } from '../../infrastructure/schedulers/services/cron.service';
+import { JwtTokenService } from '../../shared/services/jwt.service';
+import { JwtTokenModule } from '../../shared/modules/jwt.module';
 
 @Module({
-  imports: [HttpModule],
+  imports: [HttpModule, JwtTokenModule],
   controllers: [SubscriptionController],
-  providers: [SubscriptionService, WeatherService, MailService],
+  providers: [
+    SubscriptionService,
+    WeatherService,
+    MailService,
+    CronService,
+    JwtTokenService,
+  ],
 })
 export class SubscriptionModule {}
