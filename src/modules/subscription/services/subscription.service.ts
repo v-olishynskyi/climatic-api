@@ -54,25 +54,6 @@ export class SubscriptionService {
     ]);
 
     try {
-      // send email with confirmation link
-      await this.mailService.sendEmail({
-        template: 'subscription-confirmation',
-        to: inputDto.email,
-        subject: 'Weather updates subscription confirmation',
-        context: {
-          city: inputDto.city,
-          confirmUrl: `http://localhost:3000/confirm/${confirmSubscriptionToken}`,
-          frequency: inputDto.frequency,
-        },
-      });
-
-      this.logger.log(`Confirmation email sent to ${inputDto.email}`);
-    } catch (error) {
-      this.logger.error(`Error sending email: ${error}`);
-      throw new ServiceUnavailableException('Error sending email');
-    }
-
-    try {
       // create a new subscription entity
       const subscription = this.subscriptionRepository.create({
         email: inputDto.email,
@@ -92,6 +73,25 @@ export class SubscriptionService {
     } catch (error) {
       this.logger.error(`Error saving subscription to db: ${error}`);
       throw new ServiceUnavailableException('Error saving subscription to db');
+    }
+
+    try {
+      // send email with confirmation link
+      await this.mailService.sendEmail({
+        template: 'subscription-confirmation',
+        to: inputDto.email,
+        subject: 'Weather updates subscription confirmation',
+        context: {
+          city: inputDto.city,
+          confirmUrl: `http://localhost:3000/confirm/${confirmSubscriptionToken}`,
+          frequency: inputDto.frequency,
+        },
+      });
+
+      this.logger.log(`Confirmation email sent to ${inputDto.email}`);
+    } catch (error) {
+      this.logger.error(`Error sending email: ${error}`);
+      throw new ServiceUnavailableException('Error sending email');
     }
   }
 
