@@ -1,11 +1,14 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppConfigService } from '../../config/shared-config.service';
+import { AppConfigModule } from '../../config/config.module';
 
 @Module({
   imports: [
+    AppConfigModule,
     TypeOrmModule.forRootAsync({
       inject: [AppConfigService],
+      imports: [AppConfigModule],
 
       useFactory: (configService: AppConfigService) => ({
         type: 'postgres',
@@ -17,6 +20,7 @@ import { AppConfigService } from '../../config/shared-config.service';
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: process.env.NODE_ENV !== 'production',
         autoLoadEntities: true,
+        logging: true,
       }),
     }),
   ],

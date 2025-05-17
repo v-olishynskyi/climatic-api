@@ -8,9 +8,15 @@ import { CronService } from '../../infrastructure/schedulers/services/cron.servi
 import { JwtTokenService } from '../../shared/services/jwt.service';
 import { JwtTokenModule } from '../../shared/infrastructure/jwt.module';
 import { WeatherSchedulerService } from '../../infrastructure/schedulers/services/weather-scheduler.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Subscription } from './entities/subsciption.entity';
 
 @Module({
-  imports: [HttpModule, JwtTokenModule],
+  imports: [
+    HttpModule,
+    JwtTokenModule,
+    TypeOrmModule.forFeature([Subscription]),
+  ],
   controllers: [SubscriptionController],
   providers: [
     SubscriptionService,
