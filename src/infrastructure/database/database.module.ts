@@ -18,7 +18,7 @@ import { AppConfigModule } from '../../config/config.module';
         password: configService.get('pg.POSTGRES_PASSWORD'),
         database: configService.get('pg.POSTGRES_DB'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: process.env.NODE_ENV !== 'production',
+        synchronize: true, // TODO: change to false for production
         autoLoadEntities: true,
         logging: true,
       }),
