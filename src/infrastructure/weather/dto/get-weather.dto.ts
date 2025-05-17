@@ -1,4 +1,36 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Exclude } from 'class-transformer';
+
+export class GetWeatherByCityDto {
+  @ApiProperty({
+    name: 'temperature',
+    type: Number,
+    example: 25,
+    description: 'Current temperature',
+  })
+  temperature: number;
+
+  @ApiProperty({
+    name: 'humidity',
+    type: Number,
+    example: 65,
+    description: 'Current humidity percentage',
+  })
+  humidity: number;
+
+  @ApiProperty({
+    name: 'description',
+    type: String,
+    example: 'Cloudy',
+    description: 'Weather description',
+  })
+  description: string;
+
+  @Exclude()
+  icon: string;
+}
+
+export class GetWeatherByCityWithIconDto extends GetWeatherByCityDto {}
 
 export class WeatherApiResponseDto {
   location: Location;
@@ -10,30 +42,6 @@ export class WeatherApiError {
     code: number;
     message: string;
   };
-}
-
-export class GetWeatherByCityDto {
-  @ApiProperty({
-    name: 'temperature',
-    type: Number,
-    example: 25,
-    description: 'Current temperature',
-  })
-  temperature: number;
-  @ApiProperty({
-    name: 'humidity',
-    type: Number,
-    example: 65,
-    description: 'Current humidity percentage',
-  })
-  humidity: number;
-  @ApiProperty({
-    name: 'description',
-    type: String,
-    example: 'Cloudy',
-    description: 'Weather description',
-  })
-  description: string;
 }
 
 class Location {

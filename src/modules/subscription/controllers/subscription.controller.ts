@@ -97,8 +97,9 @@ export class SubscriptionController {
     description: 'Token not found',
   })
   @Get('/unsubscribe/:token')
-  unsubscribeFromWeatherUpdates(@Param('token') token: string): string {
-    console.log('token', token);
-    return token;
+  unsubscribeFromWeatherUpdates(
+    @Param('token') token: string,
+  ): Promise<string> {
+    return this.subscriptionService.unsubscribeFromWeatherUpdates(token);
   }
 }

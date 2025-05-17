@@ -1,17 +1,47 @@
-# ===== Базовий імідж =====
-FROM node:20-alpine
+# ---------- Base stage ----------
+FROM node:20-alpine AS base
 
 WORKDIR /app
 
+# Копіюємо файли package*
 COPY package*.json ./
+
+# ---------- Development stage ----------
+FROM base AS development
+
+# Встановлюємо всі залежності (включаючи dev)
 RUN npm install
+
+# Копіюємо все
+COPY . .
+
+# Відкриваємо порт
+EXPOSE 3000
+
+CMD ["npm", "run", "start:dev"]
+
+# ---------- Build stage ----------
+FROM base AS build
+
+RUN npm ci
 
 COPY . .
 
-# Якщо ENV = production — запускаємо компіляцію
-ARG NODE_ENV=development
-ENV NODE_ENV=${NODE_ENV}
+RUN npm run build
 
-RUN if [ "$NODE_ENV" = "production" ]; then npm run build; fi
 
-CMD if [ "$NODE_ENV" = "production" ]; then node dist/main.js; else npm run start:dev; fi
+# ---------- Production stage ----------
+FROM node:20-alpine AS production
+
+WORKDIR /app
+
+# Копіюємо dist та прод-залежності
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/package*.json ./
+
+ENV NODE_ENV=production
+
+EXPOSE 3000
+
+CMD ["node", "dist/main.js"]

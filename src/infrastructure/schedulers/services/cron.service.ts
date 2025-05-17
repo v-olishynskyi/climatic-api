@@ -16,4 +16,20 @@ export class CronService {
     this.schedulerRegistry.addCronJob(taskId, job);
     job.start();
   }
+
+  async stopCronTask(taskId: string) {
+    // Check if the task exists
+    const isJobExists = this.schedulerRegistry.doesExist('cron', taskId);
+
+    if (!isJobExists) {
+      return true;
+    }
+
+    const job = this.schedulerRegistry.getCronJob(taskId);
+
+    await job.stop();
+    this.schedulerRegistry.deleteCronJob(taskId);
+
+    return true;
+  }
 }

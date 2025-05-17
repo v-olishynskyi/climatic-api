@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  InternalServerErrorException,
   Logger,
   NotFoundException,
   ServiceUnavailableException,
@@ -75,6 +76,7 @@ export class SubscriptionService {
       throw new ServiceUnavailableException('Error saving subscription to db');
     }
 
+    // TODO: add a check if the email is not send
     try {
       // send email with confirmation link
       await this.mailService.sendEmail({
@@ -123,24 +125,64 @@ export class SubscriptionService {
       throw new BadRequestException('Invalid token');
     }
 
+    // first we need to update the subscription entity
+    // mark the subscription as "confirmed" by removing the token
+    try {
+      await this.subscriptionRepository.update(subscription.id, {
+        subscribe_token: null,
+      });
+    } catch (error) {
+      this.logger.error(`Error updating subscription: ${error}`);
+      throw new InternalServerErrorException(
+        'Error updating subscription. Try again',
+      );
+    }
+
+    // TODO
+    const unsubscribeUrl = `http://localhost:3000/unsubscribe/${subscription.unsubscribe_token}`;
+
+    // and then we need to start the cron job for this subscription
     this.cronService.createAndStartCronTask(
-      token,
+      subscription.id,
       () =>
         this.weatherScheduler.scheduleWeatherUpdate(
           subscription.city,
           subscription.email,
+          unsubscribeUrl,
+          subscription.frequency,
         ),
       '30 * * * * *',
       // subscription.frequency,
     );
     this.logger.log(`Cron job created and started for ${subscription.email}`);
 
-    // update the subscription entity
-    // mark the subscription as confirmed and remove the token
-    await this.subscriptionRepository.update(subscription.id, {
-      subscribe_token: null,
+    return 'Subscription confirmed successfully';
+  }
+
+  async unsubscribeFromWeatherUpdates(unsubscribeToken: string) {
+    // check if token is exists in the db
+    const subscription = await this.subscriptionRepository.findOne({
+      where: { unsubscribe_token: unsubscribeToken },
     });
 
-    return 'Subscription confirmed successfully';
+    if (!subscription) {
+      this.logger.error(`Subscription not found`);
+      throw new NotFoundException('Subscription not found');
+    }
+
+    try {
+      // remove the subscription from db
+      await this.subscriptionRepository.delete(subscription.id);
+    } catch (error) {
+      this.logger.error(`Error deleting subscription: ${error}`);
+      throw new InternalServerErrorException(
+        'Error deleting subscription. Try again',
+      );
+    }
+
+    // stop the cron job for this subscription
+    await this.cronService.stopCronTask(subscription.id);
+
+    return 'Subscription removed successfully';
   }
 }

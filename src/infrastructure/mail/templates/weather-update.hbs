@@ -1,0 +1,84 @@
+<html lang='uk'>
+  <head>
+    <meta charset='UTF-8' />
+    <title>Оновлення погоди</title>
+  </head>
+  <body
+    style='margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f2f2f2;'
+  >
+    <table width='100%' bgcolor='#f2f2f2' cellpadding='0' cellspacing='0'>
+      <tr>
+        <td align='center'>
+          <table
+            width='600'
+            style='background-color: #ffffff; padding: 20px; border-radius: 8px;'
+          >
+            <!-- Заголовок -->
+            <tr>
+              <td align='center'>
+                <h1 style='color: #333333;'>Прогноз погоди для {{city}}</h1>
+              </td>
+            </tr>
+
+            <!-- Іконка + опис -->
+            <tr>
+              <td align='center' style='padding: 10px;'>
+                <img src={{icon}} alt={{description}} width='64' height='64' />
+                <p
+                  style='margin: 10px 0; font-size: 18px; color: #555555;'
+                >{{description}}</p>
+              </td>
+            </tr>
+
+            <!-- Температура -->
+            <tr>
+              <td align='center'>
+                <p
+                  style='font-size: 48px; margin: 0; color: #007BFF;'
+                >{{temperature}}°C</p>
+              </td>
+            </tr>
+
+            <!-- Роздільник -->
+            <tr>
+              <td style='padding: 20px 0;'>
+                <hr style='border: none; border-top: 1px solid #e0e0e0;' />
+              </td>
+            </tr>
+
+            <!-- Частота оновлень -->
+            <tr>
+              <td align='center' style='font-size: 14px; color: #999999;'>
+                Ви отримали
+                {{#if (eq frequency 'hourly')}}погодинне{{else}}щоденне{{/if}}
+                оновлення.
+              </td>
+            </tr>
+
+            <!-- Кнопка відписки -->
+            <tr>
+              <td align='center' style='padding-top: 20px;'>
+                <a
+                  href='{{unsubscribeUrl}}'
+                  style='display: inline-block; padding: 12px 24px; background-color: #dc3545; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold;'
+                >
+                  Відписатись
+                </a>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td
+                align='center'
+                style='padding-top: 30px; font-size: 12px; color: #aaaaaa;'
+              >
+                © 2025 Climatic. Усі права захищені.
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

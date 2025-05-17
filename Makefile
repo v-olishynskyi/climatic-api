@@ -39,3 +39,29 @@ lint:
 # Форматування з prettier
 format:
 	docker-compose exec api npm run format
+
+# ---------- Variables ----------
+DOCKER_COMPOSE_PROD = docker-compose -f docker-compose.prod.yml
+APP_NAME = climatic_api_prod
+
+# ---------- Production ----------
+prod-up:
+	$(DOCKER_COMPOSE_PROD) up -d --build
+
+prod-down:
+	$(DOCKER_COMPOSE_PROD) down
+
+prod-restart:
+	$(DOCKER_COMPOSE_PROD) restart
+
+prod-logs:
+	$(DOCKER_COMPOSE_PROD) logs -f $(APP_NAME)
+
+prod-sh:
+	$(DOCKER_COMPOSE_PROD) exec $(APP_NAME) sh
+
+prod-clean:
+	$(DOCKER_COMPOSE_PROD) down -v --remove-orphans
+
+prod-rebuild:
+	$(DOCKER_COMPOSE_PROD) build --no-cache

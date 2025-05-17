@@ -8,8 +8,8 @@ import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 import {
   WeatherApiResponseDto,
-  GetWeatherByCityDto,
   WeatherApiError,
+  GetWeatherByCityWithIconDto,
 } from '../dto/get-weather.dto';
 import { AxiosError } from 'axios';
 
@@ -20,7 +20,7 @@ export class WeatherService {
     private readonly httpService: HttpService,
   ) {}
 
-  async getWeather(city: string): Promise<GetWeatherByCityDto> {
+  async getWeather(city: string): Promise<GetWeatherByCityWithIconDto> {
     try {
       // TODO: add url builder
       const { data } = await firstValueFrom(
@@ -33,6 +33,7 @@ export class WeatherService {
         temperature: data.current.temp_c,
         humidity: data.current.humidity,
         description: data.current.condition.text,
+        icon: data.current.condition.icon,
       };
     } catch (error) {
       if (error?.isAxiosError) {

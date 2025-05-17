@@ -1,4 +1,12 @@
-import { BadRequestException, Controller, Get, Query } from '@nestjs/common';
+import {
+  BadRequestException,
+  ClassSerializerInterceptor,
+  Controller,
+  Get,
+  Query,
+  SerializeOptions,
+  UseInterceptors,
+} from '@nestjs/common';
 import { WeatherService } from '../services/weather.service';
 import {
   ApiBadRequestResponse,
@@ -30,8 +38,10 @@ export class WeatherController {
     type: String,
     description: 'City name for weather forecast',
   })
+  @UseInterceptors(ClassSerializerInterceptor)
+  @SerializeOptions({ type: GetWeatherByCityDto })
   @Get('/weather')
-  getWeatherByCity(@Query('city') city: string) {
+  getWeatherByCity(@Query('city') city: string): Promise<GetWeatherByCityDto> {
     if (!city.trim()) {
       throw new BadRequestException();
     }
