@@ -4,15 +4,17 @@ import { WeatherModule } from './infrastructure/weather/weather.module';
 import { SubscriptionModule } from './modules/subscription/subscription.module';
 import { MailModule } from './infrastructure/mail/mail.module';
 import { SchedulerModule } from './infrastructure/schedulers/scheduler.module';
-import configurations from './config/configurations';
-import { JwtTokenModule } from './shared/modules/jwt.module';
+import configurations from './config';
+import { JwtTokenModule } from './shared/infrastructure/jwt.module';
+import { DatabaseModule } from './infrastructure/database/database.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [configurations],
+      load: configurations,
     }),
+    DatabaseModule,
     JwtTokenModule,
     SchedulerModule,
     MailModule,
