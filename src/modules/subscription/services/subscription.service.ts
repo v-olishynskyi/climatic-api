@@ -16,6 +16,10 @@ import { WeatherSchedulerService } from '../../../infrastructure/schedulers/serv
 import { InjectRepository } from '@nestjs/typeorm';
 import { Subscription } from '../entities/subsciption.entity';
 import { Repository } from 'typeorm';
+import {
+  generateSubscribeUrl,
+  generateUnsubscribeUrl,
+} from '../../../shared/helpers/url.helper';
 
 type JWTPayload = Record<string, unknown>;
 @Injectable()
@@ -85,7 +89,7 @@ export class SubscriptionService {
         subject: 'Weather updates subscription confirmation',
         context: {
           city: inputDto.city,
-          confirmUrl: `http://localhost:3000/confirm/${confirmSubscriptionToken}`,
+          confirmUrl: generateSubscribeUrl(confirmSubscriptionToken),
           frequency: inputDto.frequency,
         },
       });
@@ -138,21 +142,21 @@ export class SubscriptionService {
       );
     }
 
-    // TODO
-    const unsubscribeUrl = `http://localhost:3000/unsubscribe/${subscription.unsubscribe_token}`;
+    const unsubscribeUrl = generateUnsubscribeUrl(
+      subscription.unsubscribe_token,
+    );
 
     // and then we need to start the cron job for this subscription
     this.cronService.createAndStartCronTask(
       subscription.id,
       () =>
-        this.weatherScheduler.scheduleWeatherUpdate(
-          subscription.city,
-          subscription.email,
+        this.weatherScheduler.scheduleWeatherUpdate({
+          email: subscription.email,
+          city: subscription.city,
           unsubscribeUrl,
-          subscription.frequency,
-        ),
-      '30 * * * * *',
-      // subscription.frequency,
+          frequency: subscription.frequency,
+        }),
+      '30 * * * * *', // TODO: change this to the frequency of the subscription
     );
     this.logger.log(`Cron job created and started for ${subscription.email}`);
 

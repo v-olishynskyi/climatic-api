@@ -12,6 +12,7 @@ import {
   GetWeatherByCityWithIconDto,
 } from '../dto/get-weather.dto';
 import { AxiosError } from 'axios';
+import { generateWeatherUrl } from '../../../shared/helpers/url.helper';
 
 @Injectable()
 export class WeatherService {
@@ -22,11 +23,8 @@ export class WeatherService {
 
   async getWeather(city: string): Promise<GetWeatherByCityWithIconDto> {
     try {
-      // TODO: add url builder
       const { data } = await firstValueFrom(
-        this.httpService.get<WeatherApiResponseDto>(
-          `https://api.weatherapi.com/v1/current.json?q=${city}&key=${this.configService.get('WEATHER_API_KEY')}`,
-        ),
+        this.httpService.get<WeatherApiResponseDto>(generateWeatherUrl(city)),
       );
 
       return {

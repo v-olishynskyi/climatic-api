@@ -16,4 +16,6 @@ export interface AppConfig {
     POSTGRES_PASSWORD: string;
     POSTGRES_DB: string;
   };
+
+  API_URL: string;
 }
