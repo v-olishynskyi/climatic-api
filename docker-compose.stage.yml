@@ -4,8 +4,8 @@ services:
   api:
     build:
       context: .
-      dockerfile: Dockerfile_dev
-    container_name: climatic_api_dev
+      dockerfile: Dockerfile_stage
+    container_name: climatic_api_stage
     ports:
       - '3000:3000'
     volumes:
@@ -17,7 +17,7 @@ services:
 
   postgres:
     image: postgres:15
-    container_name: climatic_db_dev
+    container_name: climatic_db_stage
     restart: always
     environment:
       POSTGRES_DB: ${POSTGRES_DB}

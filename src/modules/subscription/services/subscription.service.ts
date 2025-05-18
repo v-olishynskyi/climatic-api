@@ -1,6 +1,4 @@
 import {
-  BadRequestException,
-  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -15,16 +13,14 @@ import { JwtTokenService } from '../../../shared/services/jwt.service';
 import { WeatherSchedulerService } from '../../../infrastructure/schedulers/services/weather-scheduler.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Subscription } from '../entities/subsciption.entity';
-import { Repository } from 'typeorm';
-import {
-  generateSubscribeUrl,
-  generateUnsubscribeUrl,
-} from '../../../shared/helpers/url.helper';
+import { DataSource, Repository } from 'typeorm';
+import { createHash } from 'node:crypto';
+import { MailFactory } from '../../../infrastructure/mail/factory/mail.factory';
 
-type JWTPayload = Record<string, unknown>;
 @Injectable()
 export class SubscriptionService {
   private readonly logger = new Logger(SubscriptionService.name);
+  private readonly mailFactory = new MailFactory();
 
   constructor(
     @InjectRepository(Subscription)
@@ -35,105 +31,77 @@ export class SubscriptionService {
     private readonly cronService: CronService,
     private readonly jwtTokenService: JwtTokenService,
     private readonly weatherScheduler: WeatherSchedulerService,
+    private readonly dataSource: DataSource,
   ) {}
 
   async subscribeToWeatherUpdates(inputDto: SubscribeWeatherUpdatesDto) {
     // first we need to check if city is correct
-    const weatherCheckPromise = this.weatherService.getWeather(inputDto.city);
+    await this.weatherService.getWeather(inputDto.city);
 
-    const payload: JWTPayload = {
-      sub: inputDto.email,
-      city: inputDto.city,
-      frequency: inputDto.frequency,
-    };
+    // generate token for subscription
+    const payloadString = `${inputDto.email}${new Date().getTime()}`;
+    const hash = createHash('sha256');
+    const subscriptionToken = hash.update(payloadString).digest('hex');
 
-    const [confirmSubscriptionToken, unsubscribeToken] = await Promise.all([
-      // create a new token for confirmation
-      // this token will be used to confirm the subscription
-      this.jwtTokenService.signAsync(payload, { expiresIn: '1h' }),
-      // create a new token for unsubscribe
-      // this token will be used to unsubscribe from the weather updates
-      this.jwtTokenService.signAsync(payload),
-      // check if city is valid
-      weatherCheckPromise,
-    ]);
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
     try {
       // create a new subscription entity
-      const subscription = this.subscriptionRepository.create({
+      const subscription = queryRunner.manager.create(Subscription, {
         email: inputDto.email,
         city: inputDto.city,
         frequency: inputDto.frequency,
-        subscribe_token: confirmSubscriptionToken,
-        unsubscribe_token: unsubscribeToken,
+        subscription_token: subscriptionToken,
       });
 
       // store the token on db
-      const newSubscription =
-        await this.subscriptionRepository.save(subscription);
-      this.logger.log(
-        `Subscription saved to db for email: ${newSubscription.email}, city: ${newSubscription.city}`,
-        newSubscription,
-      );
-    } catch (error) {
-      this.logger.error(`Error saving subscription to db: ${error}`);
+      await queryRunner.manager.save(subscription);
+
+      try {
+        // send email with confirmation link
+        await this.mailService.sendEmail(
+          this.mailFactory.createSubscriptionConfirmationMail(
+            inputDto,
+            subscriptionToken,
+          ),
+        );
+
+        await queryRunner.commitTransaction();
+
+        this.logger.log(`Confirmation email sent to ${inputDto.email}`);
+      } catch (emailError) {
+        this.logger.error(`Error sending email: ${emailError}`);
+        await queryRunner.rollbackTransaction();
+        throw new ServiceUnavailableException('Error sending email');
+      }
+    } catch (dbError) {
+      this.logger.error(`Error saving subscription to db: ${dbError}`);
+      await queryRunner.rollbackTransaction();
       throw new ServiceUnavailableException('Error saving subscription to db');
-    }
-
-    // TODO: add a check if the email is not send
-    try {
-      // send email with confirmation link
-      await this.mailService.sendEmail({
-        template: 'subscription-confirmation',
-        to: inputDto.email,
-        subject: 'Weather updates subscription confirmation',
-        context: {
-          city: inputDto.city,
-          confirmUrl: generateSubscribeUrl(confirmSubscriptionToken),
-          frequency: inputDto.frequency,
-        },
-      });
-
-      this.logger.log(`Confirmation email sent to ${inputDto.email}`);
-    } catch (error) {
-      this.logger.error(`Error sending email: ${error}`);
-      throw new ServiceUnavailableException('Error sending email');
+    } finally {
+      await queryRunner.release();
     }
   }
 
   async confirmSubscription(token: string) {
     // check if token is exists in the db
     const subscription = await this.subscriptionRepository.findOne({
-      where: { subscribe_token: token },
+      where: { subscription_token: token },
     });
 
-    if (!subscription || !subscription.subscribe_token) {
+    if (!subscription || !subscription.subscription_token) {
       this.logger.error(`Token not found: ${token}`);
       throw new NotFoundException('Token not found');
-    }
-
-    try {
-      // check if token is valid
-      await this.jwtTokenService.verifyAsync<JWTPayload>(
-        subscription.subscribe_token,
-      );
-    } catch (error) {
-      if (error.name === 'TokenExpiredError') {
-        this.logger.error(`Token expired: ${subscription.subscribe_token}`);
-        // remove the subscription from db because the token is expired
-        await this.subscriptionRepository.delete(subscription.id);
-        throw new ForbiddenException('Token expired');
-      }
-
-      this.logger.error('Invalid token', error);
-      throw new BadRequestException('Invalid token');
     }
 
     // first we need to update the subscription entity
     // mark the subscription as "confirmed" by removing the token
     try {
       await this.subscriptionRepository.update(subscription.id, {
-        subscribe_token: null,
+        subscribed: true,
       });
     } catch (error) {
       this.logger.error(`Error updating subscription: ${error}`);
@@ -142,31 +110,13 @@ export class SubscriptionService {
       );
     }
 
-    const unsubscribeUrl = generateUnsubscribeUrl(
-      subscription.unsubscribe_token,
-    );
-
-    // and then we need to start the cron job for this subscription
-    this.cronService.createAndStartCronTask(
-      subscription.id,
-      () =>
-        this.weatherScheduler.scheduleWeatherUpdate({
-          email: subscription.email,
-          city: subscription.city,
-          unsubscribeUrl,
-          frequency: subscription.frequency,
-        }),
-      '30 * * * * *', // TODO: change this to the frequency of the subscription
-    );
-    this.logger.log(`Cron job created and started for ${subscription.email}`);
-
     return 'Subscription confirmed successfully';
   }
 
   async unsubscribeFromWeatherUpdates(unsubscribeToken: string) {
     // check if token is exists in the db
     const subscription = await this.subscriptionRepository.findOne({
-      where: { unsubscribe_token: unsubscribeToken },
+      where: { subscription_token: unsubscribeToken },
     });
 
     if (!subscription) {
@@ -176,7 +126,10 @@ export class SubscriptionService {
 
     try {
       // remove the subscription from db
-      await this.subscriptionRepository.delete(subscription.id);
+      await this.subscriptionRepository.update(subscription.id, {
+        subscribed: false,
+        unsubscribed_at: new Date(),
+      });
     } catch (error) {
       this.logger.error(`Error deleting subscription: ${error}`);
       throw new InternalServerErrorException(

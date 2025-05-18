@@ -42,11 +42,15 @@ format:
 
 # ---------- Variables ----------
 DOCKER_COMPOSE_PROD = docker-compose -f docker-compose.prod.yml
+DOCKER_COMPOSE_STAGE = docker-compose -f docker-compose.stage.yml
 APP_NAME = climatic_api_prod
 
 # ---------- Production ----------
 prod-up:
 	$(DOCKER_COMPOSE_PROD) up -d --build
+
+stage-up:
+	$(DOCKER_COMPOSE_STAGE) up -d --build
 
 prod-down:
 	$(DOCKER_COMPOSE_PROD) down

@@ -1,10 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import { SchedulerRegistry } from '@nestjs/schedule';
+import { Cron, SchedulerRegistry } from '@nestjs/schedule';
 import { CronCommand, CronJob } from 'cron';
 
 @Injectable()
 export class CronService {
   constructor(private readonly schedulerRegistry: SchedulerRegistry) {}
+
+  @Cron('30 * * * * *')
+  test__30secWeatherUpdateCronJob() {
+    console.log('Hourly weather update cron job executed');
+  }
+
+  @Cron('0 07 * * *')
+  hourlyWeatherUpdateCronJob() {
+    console.log('Hourly weather update cron job executed');
+  }
 
   createAndStartCronTask(
     taskId: string,

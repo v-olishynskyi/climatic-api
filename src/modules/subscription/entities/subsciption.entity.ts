@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 import { FrequencyUpdatesEnum } from '../enum';
 
 @Entity('subscriptions')
@@ -12,12 +12,17 @@ export class Subscription {
   @Column()
   email: string;
 
-  @Column({ type: 'varchar', nullable: true })
-  subscribe_token: string | null;
-
+  @Index({ unique: true })
   @Column()
-  unsubscribe_token: string;
+  subscription_token: string;
 
+  @Index()
   @Column({ enum: FrequencyUpdatesEnum })
   frequency: FrequencyUpdatesEnum;
+
+  @Column({ default: false })
+  subscribed: boolean;
+
+  @Column({ name: 'unsubscribed_at', type: 'timestamp' })
+  unsubscribed_at: Date;
 }

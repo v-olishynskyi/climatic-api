@@ -9,7 +9,6 @@ services:
       args:
         NODE_ENV: production
     container_name: climatic_api_prod
-    command: node dist/main.js
     ports:
       - '3000:3000'
     env_file:

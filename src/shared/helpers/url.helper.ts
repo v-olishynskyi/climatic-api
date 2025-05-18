@@ -4,7 +4,7 @@ export function generateUnsubscribeUrl(unsubscribeToken: string): string {
   return `${baseUrl}/unsubscribe/${unsubscribeToken}`;
 }
 export function generateWeatherUrl(city: string): string {
-  const weatherApiUrl = process.env.WEAHER_API_URL;
+  const weatherApiUrl = process.env.WEATHER_API_URL;
   const apiKey = process.env.WEATHER_API_KEY;
 
   return `${weatherApiUrl}/v1/current.json?q=${city}&key=${apiKey}`;
