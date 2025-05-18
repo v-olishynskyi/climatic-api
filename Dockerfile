@@ -1,47 +1,14 @@
-# ---------- Base stage ----------
-FROM node:20-alpine AS base
+FROM node:20-alpine3.21
 
-WORKDIR /app
+ENV NODE_ENV=development
 
-# Копіюємо файли package*
+WORKDIR /var/www/application
+
 COPY package*.json ./
-
-# ---------- Development stage ----------
-FROM base AS development
-
-# Встановлюємо всі залежності (включаючи dev)
-RUN npm install
-
-# Копіюємо все
-COPY . .
-
-# Відкриваємо порт
-EXPOSE 3000
-
-CMD ["npm", "run", "start:dev"]
-
-# ---------- Build stage ----------
-FROM base AS build
-
 RUN npm ci
 
 COPY . .
 
-RUN npm run build
-
-
-# ---------- Production stage ----------
-FROM node:20-alpine AS production
-
-WORKDIR /app
-
-# Копіюємо dist та прод-залежності
-COPY --from=build /app/dist ./dist
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/package*.json ./
-
-ENV NODE_ENV=production
-
 EXPOSE 3000
 
-CMD ["node", "dist/main.js"]
+CMD ["npm", "run", "start:dev"]

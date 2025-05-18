@@ -23,6 +23,6 @@ export class Subscription {
   @Column({ default: false })
   subscribed: boolean;
 
-  @Column({ name: 'unsubscribed_at', type: 'timestamp' })
+  @Column({ name: 'unsubscribed_at', type: 'timestamp', nullable: true })
   unsubscribed_at: Date;
 }

@@ -10,12 +10,14 @@ import { JwtTokenModule } from '../../shared/infrastructure/jwt.module';
 import { WeatherSchedulerService } from '../../infrastructure/schedulers/services/weather-scheduler.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Subscription } from './entities/subsciption.entity';
+import { MailQueuesModule } from '../../queues/mail/mail.queue.module';
 
 @Module({
   imports: [
     HttpModule,
     JwtTokenModule,
     TypeOrmModule.forFeature([Subscription]),
+    MailQueuesModule,
   ],
   controllers: [SubscriptionController],
   providers: [

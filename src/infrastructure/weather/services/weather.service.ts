@@ -4,7 +4,6 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 import {
   WeatherApiResponseDto,
@@ -16,10 +15,7 @@ import { generateWeatherUrl } from '../../../shared/helpers/url.helper';
 
 @Injectable()
 export class WeatherService {
-  constructor(
-    private readonly configService: ConfigService,
-    private readonly httpService: HttpService,
-  ) {}
+  constructor(private readonly httpService: HttpService) {}
 
   async getWeather(city: string): Promise<GetWeatherByCityWithIconDto> {
     try {

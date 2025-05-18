@@ -17,5 +17,11 @@ export interface AppConfig {
     POSTGRES_DB: string;
   };
 
+  redis: {
+    REDIS_EMAIL_HOST: string;
+    REDIS_EMAIL_PORT: number;
+    REDIS_EMAIL_PASSWORD: string;
+  };
+
   API_URL: string;
 }

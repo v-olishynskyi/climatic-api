@@ -3,35 +3,27 @@ import {
   InternalServerErrorException,
   Logger,
   NotFoundException,
-  ServiceUnavailableException,
 } from '@nestjs/common';
 import { SubscribeWeatherUpdatesDto } from '../dto';
 import { WeatherService } from '../../../infrastructure/weather/services/weather.service';
-import { MailService } from '../../../infrastructure/mail/services/mail.service';
 import { CronService } from '../../../infrastructure/schedulers/services/cron.service';
-import { JwtTokenService } from '../../../shared/services/jwt.service';
-import { WeatherSchedulerService } from '../../../infrastructure/schedulers/services/weather-scheduler.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Subscription } from '../entities/subsciption.entity';
-import { DataSource, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { createHash } from 'node:crypto';
-import { MailFactory } from '../../../infrastructure/mail/factory/mail.factory';
+import { MailQueueService } from '../../../queues/mail/mail.queue.sevice';
 
 @Injectable()
 export class SubscriptionService {
   private readonly logger = new Logger(SubscriptionService.name);
-  private readonly mailFactory = new MailFactory();
 
   constructor(
     @InjectRepository(Subscription)
     private readonly subscriptionRepository: Repository<Subscription>,
 
     private readonly weatherService: WeatherService,
-    private readonly mailService: MailService,
     private readonly cronService: CronService,
-    private readonly jwtTokenService: JwtTokenService,
-    private readonly weatherScheduler: WeatherSchedulerService,
-    private readonly dataSource: DataSource,
+    private readonly mailQueueService: MailQueueService,
   ) {}
 
   async subscribeToWeatherUpdates(inputDto: SubscribeWeatherUpdatesDto) {
@@ -43,46 +35,25 @@ export class SubscriptionService {
     const hash = createHash('sha256');
     const subscriptionToken = hash.update(payloadString).digest('hex');
 
-    const queryRunner = this.dataSource.createQueryRunner();
-
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
+    // create a new subscription entity
+    const subscription = this.subscriptionRepository.create({
+      email: inputDto.email,
+      city: inputDto.city,
+      frequency: inputDto.frequency,
+      subscription_token: subscriptionToken,
+    });
 
     try {
-      // create a new subscription entity
-      const subscription = queryRunner.manager.create(Subscription, {
-        email: inputDto.email,
-        city: inputDto.city,
-        frequency: inputDto.frequency,
-        subscription_token: subscriptionToken,
-      });
-
       // store the token on db
-      await queryRunner.manager.save(subscription);
+      await this.subscriptionRepository.save(subscription);
 
-      try {
-        // send email with confirmation link
-        await this.mailService.sendEmail(
-          this.mailFactory.createSubscriptionConfirmationMail(
-            inputDto,
-            subscriptionToken,
-          ),
-        );
-
-        await queryRunner.commitTransaction();
-
-        this.logger.log(`Confirmation email sent to ${inputDto.email}`);
-      } catch (emailError) {
-        this.logger.error(`Error sending email: ${emailError}`);
-        await queryRunner.rollbackTransaction();
-        throw new ServiceUnavailableException('Error sending email');
-      }
-    } catch (dbError) {
-      this.logger.error(`Error saving subscription to db: ${dbError}`);
-      await queryRunner.rollbackTransaction();
-      throw new ServiceUnavailableException('Error saving subscription to db');
-    } finally {
-      await queryRunner.release();
+      // send email with confirmation link
+      await this.mailQueueService.sendEmail(subscription);
+    } catch (error) {
+      this.logger.error(`Error creating subscription: ${error}`);
+      throw new InternalServerErrorException(
+        `Error creating subscription. Try again ${error}`,
+      );
     }
   }
 
