@@ -5,6 +5,7 @@ import { SubscriptionService } from '../../../modules/subscription/services/subs
 import { FrequencyUpdatesEnum } from '../../../modules/subscription/enum';
 import { WeatherByCityDto } from '../../weather/dto/get-weather.dto';
 import { WeatherQueueDispatcher } from '../../../queues/mail-weather/weather-queue-dispatcher.service';
+import { Subscription } from '../../../modules/subscription/entities/subsciption.entity';
 
 @Injectable()
 export class WeatherSchedulerService {
@@ -16,8 +17,10 @@ export class WeatherSchedulerService {
     private readonly subscriptionService: SubscriptionService,
   ) {}
 
-  @Cron('30 * * * * *')
-  async test__30secWeatherUpdateCronJob() {
+  async getUsersByFrequenctWithCityWeather(): Promise<{
+    subscribedUsers: Subscription[];
+    weatherByCity: Map<string, WeatherByCityDto>;
+  }> {
     const subscribedUsers =
       await this.subscriptionService.getAllSubscriptionsByFrequency(
         FrequencyUpdatesEnum.HOURLY,
@@ -33,6 +36,18 @@ export class WeatherSchedulerService {
     uniqueCities.forEach((city, index) => {
       weatherByCity.set(city, weathersData[index]);
     });
+
+    return { subscribedUsers, weatherByCity };
+  }
+
+  @Cron('30 * * * * *')
+  async DEV_ONLY__30secWeatherUpdateCronJob() {
+    if (process.env.NODE_ENV !== 'development') {
+      return;
+    }
+
+    const { subscribedUsers, weatherByCity } =
+      await this.getUsersByFrequenctWithCityWeather();
 
     subscribedUsers.forEach((subscription) => {
       const weather = weatherByCity.get(subscription.city);
@@ -45,21 +60,8 @@ export class WeatherSchedulerService {
 
   @Cron('0 0 * * * *')
   async hourlyWeatherUpdateCronJob() {
-    const subscribedUsers =
-      await this.subscriptionService.getAllSubscriptionsByFrequency(
-        FrequencyUpdatesEnum.HOURLY,
-      );
-
-    const uniqueCities = [...new Set(subscribedUsers.map((user) => user.city))];
-
-    const weathersData = await Promise.all(
-      uniqueCities.map((city) => this.weatherService.getWeather(city)),
-    );
-
-    const weatherByCity = new Map<string, WeatherByCityDto>();
-    uniqueCities.forEach((city, index) => {
-      weatherByCity.set(city, weathersData[index]);
-    });
+    const { subscribedUsers, weatherByCity } =
+      await this.getUsersByFrequenctWithCityWeather();
 
     subscribedUsers.forEach((subscription) => {
       const weather = weatherByCity.get(subscription.city);
@@ -72,21 +74,8 @@ export class WeatherSchedulerService {
 
   @Cron('0 07 * * *')
   async dailyWeatherUpdateCronJob() {
-    const subscribedUsers =
-      await this.subscriptionService.getAllSubscriptionsByFrequency(
-        FrequencyUpdatesEnum.DAILY,
-      );
-
-    const uniqueCities = [...new Set(subscribedUsers.map((user) => user.city))];
-
-    const weathersData = await Promise.all(
-      uniqueCities.map((city) => this.weatherService.getWeather(city)),
-    );
-
-    const weatherByCity = new Map<string, WeatherByCityDto>();
-    uniqueCities.forEach((city, index) => {
-      weatherByCity.set(city, weathersData[index]);
-    });
+    const { subscribedUsers, weatherByCity } =
+      await this.getUsersByFrequenctWithCityWeather();
 
     subscribedUsers.forEach((subscription) => {
       const weather = weatherByCity.get(subscription.city)!;
