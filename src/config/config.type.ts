@@ -6,7 +6,7 @@ export interface AppConfig {
     MAIL_HOST: string;
     MAIL_PORT: number;
     MAIL_USER: string;
-    MAIL_PASS: string;
+    MAIL_PASSWORD: string;
     MAIL_FROM: string;
   };
   pg: {
@@ -18,10 +18,13 @@ export interface AppConfig {
   };
 
   redis: {
-    REDIS_EMAIL_HOST: string;
-    REDIS_EMAIL_PORT: number;
-    REDIS_EMAIL_PASSWORD: string;
+    REDIS_HOST: string;
+    REDIS_PORT: number;
+    REDIS_PASSWORD: string;
   };
 
-  API_URL: string;
+  app: {
+    API_URL: string;
+    BULL_BOARD_PASSWORD: string;
+  };
 }

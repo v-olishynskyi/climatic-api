@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { SubscribeWeatherUpdatesDto } from '../dto';
 import { WeatherService } from '../../../infrastructure/weather/services/weather.service';
-import { CronService } from '../../../infrastructure/schedulers/services/cron.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Subscription } from '../entities/subsciption.entity';
 import { Repository } from 'typeorm';
@@ -20,9 +19,7 @@ export class SubscriptionService {
   constructor(
     @InjectRepository(Subscription)
     private readonly subscriptionRepository: Repository<Subscription>,
-
     private readonly weatherService: WeatherService,
-    private readonly cronService: CronService,
     private readonly mailConfirmationQueueService: MailConfirmationQueueService,
   ) {}
 

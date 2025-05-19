@@ -22,7 +22,7 @@ const templatesDir =
           port: configService.get('MAIL_PORT'),
           auth: {
             user: configService.get('MAIL_USER'),
-            pass: configService.get('MAIL_PASS'),
+            pass: configService.get('MAIL_PASSWORD'),
           },
         },
         defaults: {

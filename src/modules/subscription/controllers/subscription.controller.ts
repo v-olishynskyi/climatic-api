@@ -21,9 +21,13 @@ import {
 } from '@nestjs/swagger';
 import { SubscribeWeatherUpdatesDto } from '../dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { BullBoardInstance, InjectBullBoard } from '@bull-board/nestjs';
 @Controller('')
 export class SubscriptionController {
-  constructor(private readonly subscriptionService: SubscriptionService) {}
+  constructor(
+    private readonly subscriptionService: SubscriptionService,
+    @InjectBullBoard() private readonly boardInstance: BullBoardInstance,
+  ) {}
 
   @ApiOperation({
     summary: 'Subscribe to weather updates',

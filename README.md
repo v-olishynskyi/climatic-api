@@ -59,7 +59,7 @@ JWT_EXPIRES_IN=1h
 MAIL_HOST=smtp.mailtrap.io
 MAIL_PORT=2525
 MAIL_USER=your_user
-MAIL_PASS=your_pass
+MAIL_PASSWORD=your_pass
 MAIL_FROM=no-reply@climatic.dev
 🧪 Перевірка
 

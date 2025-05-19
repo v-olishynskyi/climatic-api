@@ -11,9 +11,9 @@ import Redis from 'ioredis';
       provide: 'REDIS_CLIENT',
       useFactory: (configService: AppConfigService) => {
         return new Redis({
-          host: configService.get('redis.REDIS_EMAIL_HOST'),
-          port: configService.get('redis.REDIS_EMAIL_PORT'),
-          password: configService.get('redis.REDIS_EMAIL_PASSWORD'),
+          host: configService.get('redis.REDIS_HOST'),
+          port: configService.get('redis.REDIS_PORT'),
+          password: configService.get('redis.REDIS_PASSWORD'),
         });
       },
       inject: [AppConfigService],

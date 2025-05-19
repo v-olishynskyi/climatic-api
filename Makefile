@@ -30,3 +30,15 @@ restart-dev:
 
 restart-prod:
 	make prod-down && make prod-up
+
+# Встановлення пакета всередині контейнера: make install name=назва
+install:
+	docker-compose exec api npm install $(name)
+
+# Встановлення dev-залежності: make install-dev name=назва
+install-dev:
+	docker-compose exec api npm install --save-dev $(name)
+
+# Видалення пакету: make uninstall name=назва
+uninstall:
+	docker-compose exec api npm uninstall $(name)
