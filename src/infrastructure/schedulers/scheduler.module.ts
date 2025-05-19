@@ -17,7 +17,6 @@ import { WeatherQueueDispatcher } from '../../queues/mail-weather/weather-queue-
     SubscriptionModule,
     MailConfirmationQueuesModule,
     WeatherModule,
-    // to dispatcher
     WeatherDailyQueuesModule,
     WeatherHourlyQueuesModule,
   ],
