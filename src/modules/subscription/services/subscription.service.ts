@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -10,7 +11,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Subscription } from '../entities/subsciption.entity';
 import { Repository } from 'typeorm';
 import { SubscriptionFactory } from '../factory/subscription.factory';
-import { MailConfirmationQueueService } from '../../../queues/mail-confirmation/mail-confirmation.queue.sevice';
+import { MailConfirmationQueueService } from '../../../queues/mail-confirmation/mail-confirmation.queue.service';
+import { FrequencyUpdatesEnum } from '../enum';
 
 @Injectable()
 export class SubscriptionService {
@@ -57,6 +59,11 @@ export class SubscriptionService {
       throw new NotFoundException('Token not found');
     }
 
+    if (subscription.subscribed) {
+      this.logger.error(`Subscription already confirmed`);
+      throw new ConflictException('Subscription already confirmed');
+    }
+
     // first we need to update the subscription entity
     // mark the subscription as "confirmed" by removing the token
     try {
@@ -98,5 +105,20 @@ export class SubscriptionService {
     }
 
     return 'Subscription removed successfully';
+  }
+
+  async getAllSubscriptionsByFrequency(
+    frequency: FrequencyUpdatesEnum,
+  ): Promise<Subscription[]> {
+    const subscriptions = await this.subscriptionRepository.find({
+      where: { frequency, subscribed: true },
+    });
+
+    if (!subscriptions) {
+      this.logger.error(`Subscriptions not found`);
+      throw new NotFoundException('Subscriptions not found');
+    }
+
+    return subscriptions;
   }
 }

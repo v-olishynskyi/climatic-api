@@ -2,7 +2,7 @@ import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 import { AppConfigService } from '../../config/shared-config.service';
 import { AppConfigModule } from '../../config/config.module';
-import { MailConfirmationQueueService } from './mail-confirmation.queue.sevice';
+import { MailConfirmationQueueService } from './mail-confirmation.queue.service';
 import { MailQueueProcessor } from './mail-confirmation.queue.processor';
 import { QUEUE_NAMES, QUEUES_DB } from '../constants';
 import { MailService } from '../../infrastructure/mail/services/mail.service';

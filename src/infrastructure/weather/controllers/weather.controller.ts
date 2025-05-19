@@ -15,7 +15,7 @@ import {
   ApiOperation,
   ApiQuery,
 } from '@nestjs/swagger';
-import { GetWeatherByCityDto } from '../dto/get-weather.dto';
+import { WeatherByCityDto } from '../dto/get-weather.dto';
 
 @Controller('')
 export class WeatherController {
@@ -27,7 +27,7 @@ export class WeatherController {
       'Returns the current weather forecast for the specified city using WeatherAPI.com.',
   })
   @ApiOkResponse({
-    type: [GetWeatherByCityDto],
+    type: [WeatherByCityDto],
     description: 'Successful operation - current weather forecast returned',
   })
   @ApiNotFoundResponse({ description: 'City not found' })
@@ -39,9 +39,9 @@ export class WeatherController {
     description: 'City name for weather forecast',
   })
   @UseInterceptors(ClassSerializerInterceptor)
-  @SerializeOptions({ type: GetWeatherByCityDto })
+  @SerializeOptions({ type: WeatherByCityDto })
   @Get('/weather')
-  getWeatherByCity(@Query('city') city: string): Promise<GetWeatherByCityDto> {
+  getWeatherByCity(@Query('city') city: string): Promise<WeatherByCityDto> {
     if (!city.trim()) {
       throw new BadRequestException();
     }

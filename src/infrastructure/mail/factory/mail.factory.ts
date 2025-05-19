@@ -1,7 +1,10 @@
 import { ISendMailOptions } from '@nestjs-modules/mailer';
-import { generateSubscribeUrl } from '../../../shared/helpers/url.helper';
+import {
+  generateConfirmUrl,
+  generateUnsubscribeUrl,
+} from '../../../shared/helpers/url.helper';
 import { Subscription } from '../../../modules/subscription/entities/subsciption.entity';
-import { GetWeatherByCityDto } from '../../weather/dto/get-weather.dto';
+import { WeatherByCityDto } from '../../weather/dto/get-weather.dto';
 
 export class MailFactory {
   private readonly TEMPLATE = {
@@ -18,7 +21,7 @@ export class MailFactory {
       subject: 'Weather updates subscription confirmation',
       context: {
         city: subsciption.city,
-        confirmUrl: generateSubscribeUrl(subsciption.subscription_token),
+        confirmUrl: generateConfirmUrl(subsciption.subscription_token),
         frequency: subsciption.frequency,
       },
     };
@@ -26,9 +29,9 @@ export class MailFactory {
 
   public createWeatherUpdateMail(
     subscription: Subscription,
-    weather: GetWeatherByCityDto,
+    weather: WeatherByCityDto,
   ): ISendMailOptions {
-    const unsubscribeUrl = generateSubscribeUrl(
+    const unsubscribeUrl = generateUnsubscribeUrl(
       subscription.subscription_token,
     );
 

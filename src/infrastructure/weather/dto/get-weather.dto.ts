@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 
-export class GetWeatherByCityDto {
+export class WeatherByCityDto {
   @ApiProperty({
     name: 'temperature',
     type: Number,
@@ -29,8 +29,6 @@ export class GetWeatherByCityDto {
   @Exclude()
   icon: string;
 }
-
-export class GetWeatherByCityWithIconDto extends GetWeatherByCityDto {}
 
 export class WeatherApiResponseDto {
   location: Location;

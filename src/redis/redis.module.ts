@@ -2,13 +2,14 @@ import { Global, Module } from '@nestjs/common';
 import { AppConfigService } from '../config/shared-config.service';
 import { AppConfigModule } from '../config/config.module';
 import Redis from 'ioredis';
+import { REDIS_CLIENT } from './constants';
 
 @Global()
 @Module({
   imports: [AppConfigModule],
   providers: [
     {
-      provide: 'REDIS_CLIENT',
+      provide: REDIS_CLIENT,
       useFactory: (configService: AppConfigService) => {
         return new Redis({
           host: configService.get('redis.REDIS_HOST'),
@@ -19,6 +20,6 @@ import Redis from 'ioredis';
       inject: [AppConfigService],
     },
   ],
-  exports: ['REDIS_CLIENT'],
+  exports: [REDIS_CLIENT],
 })
 export class RedisModule {}

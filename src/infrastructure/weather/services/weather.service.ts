@@ -2,33 +2,51 @@ import { HttpService } from '@nestjs/axios';
 import {
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import {
   WeatherApiResponseDto,
   WeatherApiError,
-  GetWeatherByCityWithIconDto,
+  WeatherByCityDto,
 } from '../dto/get-weather.dto';
 import { AxiosError } from 'axios';
 import { generateWeatherUrl } from '../../../shared/helpers/url.helper';
+import { WeatherCacheService } from './weather.cache.service';
 
 @Injectable()
 export class WeatherService {
-  constructor(private readonly httpService: HttpService) {}
+  private readonly logger = new Logger(WeatherService.name);
 
-  async getWeather(city: string): Promise<GetWeatherByCityWithIconDto> {
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly cache: WeatherCacheService,
+  ) {}
+
+  async getWeather(city: string): Promise<WeatherByCityDto> {
     try {
+      const cached = await this.cache.get(city);
+
+      if (cached) {
+        return cached;
+      }
+
       const { data } = await firstValueFrom(
         this.httpService.get<WeatherApiResponseDto>(generateWeatherUrl(city)),
       );
 
-      return {
+      const weather = {
         temperature: data.current.temp_c,
         humidity: data.current.humidity,
         description: data.current.condition.text,
         icon: data.current.condition.icon,
       };
+
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      await this.cache.set(city, weather);
+
+      return weather;
     } catch (error) {
       if (error?.isAxiosError) {
         const axiosError = error as AxiosError<WeatherApiError>;

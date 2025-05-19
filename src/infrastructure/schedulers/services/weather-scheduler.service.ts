@@ -1,43 +1,99 @@
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { WeatherService } from '../../weather/services/weather.service';
-import { MailService } from '../../mail/services/mail.service';
-import { Subscription } from '../../../modules/subscription/entities/subsciption.entity';
-import { MailFactory } from '../../mail/factory/mail.factory';
-// import { generateUnsubscribeUrl } from '../../../shared/helpers/url.helper';
+import { Cron } from '@nestjs/schedule';
+import { SubscriptionService } from '../../../modules/subscription/services/subscription.service';
+import { FrequencyUpdatesEnum } from '../../../modules/subscription/enum';
+import { MailWeatherQueueService } from '../../../queues/mail-weather/mail-weather.queue.service';
+import { WeatherByCityDto } from '../../weather/dto/get-weather.dto';
 
 @Injectable()
-export class WeatherSchedulerService implements OnApplicationBootstrap {
+export class WeatherSchedulerService {
   private readonly logger = new Logger(WeatherSchedulerService.name);
-  private readonly mailFactory = new MailFactory();
 
   constructor(
     private readonly weatherService: WeatherService,
-    private readonly mailService: MailService,
+    private readonly mailWeatherQueueService: MailWeatherQueueService,
+    private readonly subscriptionService: SubscriptionService,
   ) {}
 
-  async onApplicationBootstrap() {}
+  @Cron('30 * * * * *')
+  async test__30secWeatherUpdateCronJob() {
+    const subscribedUsers =
+      await this.subscriptionService.getAllSubscriptionsByFrequency(
+        FrequencyUpdatesEnum.HOURLY,
+      );
 
-  async restoreScheduledSubscriptions() {
-    // const subscriptionPromises = subscriptions.map((sub) => {
-    //   const unsubscribeUrl = generateUnsubscribeUrl(sub.unsubscribe_token);
-    //   return this.scheduleWeatherUpdate({
-    //     city: sub.city,
-    //     email: sub.email,
-    //     unsubscribeUrl,
-    //     frequency: sub.frequency,
-    //   });
-    // });
-    // await Promise.all(subscriptionPromises);
+    const uniqueCities = [...new Set(subscribedUsers.map((user) => user.city))];
+
+    const weathersData = await Promise.all(
+      uniqueCities.map((city) => this.weatherService.getWeather(city)),
+    );
+
+    const weatherByCity = new Map<string, WeatherByCityDto>();
+    uniqueCities.forEach((city, index) => {
+      weatherByCity.set(city, weathersData[index]);
+    });
+
+    subscribedUsers.forEach((subscription) => {
+      const weather = weatherByCity.get(subscription.city);
+      this.mailWeatherQueueService.sendWeatherUpdateEmail(
+        subscription,
+        weather!,
+      );
+    });
   }
 
-  // Define methods for scheduling weather-related tasks
-  async scheduleWeatherUpdate(subsciption: Subscription) {
-    const weather = await this.weatherService.getWeather(subsciption.city);
+  @Cron('0 0 * * * *')
+  async hourlyWeatherUpdateCronJob() {
+    const subscribedUsers =
+      await this.subscriptionService.getAllSubscriptionsByFrequency(
+        FrequencyUpdatesEnum.HOURLY,
+      );
 
-    await this.mailService.sendEmail(
-      this.mailFactory.createWeatherUpdateMail(subsciption, weather),
+    const uniqueCities = [...new Set(subscribedUsers.map((user) => user.city))];
+
+    const weathersData = await Promise.all(
+      uniqueCities.map((city) => this.weatherService.getWeather(city)),
     );
+
+    const weatherByCity = new Map<string, WeatherByCityDto>();
+    uniqueCities.forEach((city, index) => {
+      weatherByCity.set(city, weathersData[index]);
+    });
+
+    subscribedUsers.forEach((subscription) => {
+      const weather = weatherByCity.get(subscription.city);
+      this.mailWeatherQueueService.sendWeatherUpdateEmail(
+        subscription,
+        weather!,
+      );
+    });
+  }
+
+  @Cron('0 07 * * *')
+  async dailyWeatherUpdateCronJob() {
+    const subscribedUsers =
+      await this.subscriptionService.getAllSubscriptionsByFrequency(
+        FrequencyUpdatesEnum.DAILY,
+      );
+
+    const uniqueCities = [...new Set(subscribedUsers.map((user) => user.city))];
+
+    const weathersData = await Promise.all(
+      uniqueCities.map((city) => this.weatherService.getWeather(city)),
+    );
+
+    const weatherByCity = new Map<string, WeatherByCityDto>();
+    uniqueCities.forEach((city, index) => {
+      weatherByCity.set(city, weathersData[index]);
+    });
+
+    subscribedUsers.forEach((subscription) => {
+      const weather = weatherByCity.get(subscription.city)!;
+      this.mailWeatherQueueService.sendWeatherUpdateEmail(
+        subscription,
+        weather,
+      );
+    });
   }
 }
-
-// Other methods related to weather scheduling can be added here
