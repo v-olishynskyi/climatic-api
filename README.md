@@ -16,6 +16,8 @@
 
 ---
 
+API URL: https://climatic-api.onrender.com
+
 ---
 
 Логіка роботи апі
