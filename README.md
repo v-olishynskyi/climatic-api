@@ -66,38 +66,8 @@ API URL: https://climatic-api.onrender.com
 
 ## 🚀 Швидкий старт
 
-### 🔧 Запуск через Docker
 
-```bash
-git clone https://github.com/v-olishynskyi/climatic-api
-cd climatic-api
-
-make dev-up     # Запуск в режимі dev
-docker ps       # перевірка статусу
-make migrate    # Прогоняє міграції
-```
-
-### 📂 Доступні сервіси
-
-- Swagger: [http://localhost:3000/docs](http://localhost:3000/docs)
-- Redis: localhost:6379
-- PostgreSQL: localhost:5432
-
----
-
-## 📧 API Ендпоїнти
-
-| Method | Endpoint              | Description                |
-| ------ | --------------------- | -------------------------- |
-| POST   | `/weather`            | Отримання даних про погоду |
-| POST   | `/subscribe`          | Створення підписки         |
-| GET    | `/confirm/:token`     | Підтвердження email        |
-| GET    | `/unsubscribe/:token` | Відмова від оновлень       |
-| GET    | `/docs`               | Swagger документація       |
-
----
-
-## 🔐 .env змінні (dev)
+## 🔐 Налаштувати .env змінні (dev)
 
 ```env
 POSTGRES_HOST=localhost
@@ -124,6 +94,36 @@ BASE_URL=http://localhost:3000
 
 BULL_BOARD_PASSWORD=your_dashboard_password
 ```
+
+### 🔧 Запуск через Docker
+
+```bash
+git clone https://github.com/v-olishynskyi/climatic-api
+cd climatic-api
+
+make dev-up     # Запуск в режимі dev
+docker ps       # перевірка статусу
+```
+
+### 📂 Доступні сервіси
+
+- Swagger: [http://localhost:3000/docs](http://localhost:3000/docs)
+- Redis: localhost:6379
+- PostgreSQL: localhost:5432
+
+---
+
+## 📧 API Ендпоїнти
+
+| Method | Endpoint              | Description                |
+| ------ | --------------------- | -------------------------- |
+| POST   | `/weather`            | Отримання даних про погоду |
+| POST   | `/subscribe`          | Створення підписки         |
+| GET    | `/confirm/:token`     | Підтвердження email        |
+| GET    | `/unsubscribe/:token` | Відмова від оновлень       |
+| GET    | `/docs`               | Swagger документація       |
+
+---
 
 ---
 
