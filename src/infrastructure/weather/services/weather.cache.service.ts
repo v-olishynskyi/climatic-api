@@ -22,12 +22,11 @@ export class WeatherCacheService {
   }
 
   async set(city: string, data: WeatherByCityDto): Promise<void> {
-    const isOK = await this.redis.set(
+    await this.redis.set(
       this.getKey(city),
       JSON.stringify(data),
       'EX',
       this.TTL,
     );
-    console.log('isOK', isOK);
   }
 }

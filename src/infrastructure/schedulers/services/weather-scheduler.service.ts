@@ -3,7 +3,8 @@ import { WeatherService } from '../../weather/services/weather.service';
 import { Cron } from '@nestjs/schedule';
 import { SubscriptionService } from '../../../modules/subscription/services/subscription.service';
 import { FrequencyUpdatesEnum } from '../../../modules/subscription/enum';
-import { MailWeatherQueueService } from '../../../queues/mail-weather/mail-weather.queue.service';
+import { WeatherDailyQueueService } from '../../../queues/mail-weather/weather-daily.queue.service';
+import { WeatherHourlyQueueService } from '../../../queues/mail-weather/weather-hourly.queue.service';
 import { WeatherByCityDto } from '../../weather/dto/get-weather.dto';
 
 @Injectable()
@@ -12,7 +13,8 @@ export class WeatherSchedulerService {
 
   constructor(
     private readonly weatherService: WeatherService,
-    private readonly mailWeatherQueueService: MailWeatherQueueService,
+    private readonly weatherDailyQueueService: WeatherDailyQueueService,
+    private readonly weatherHourlyQueueService: WeatherHourlyQueueService,
     private readonly subscriptionService: SubscriptionService,
   ) {}
 
@@ -36,7 +38,7 @@ export class WeatherSchedulerService {
 
     subscribedUsers.forEach((subscription) => {
       const weather = weatherByCity.get(subscription.city);
-      this.mailWeatherQueueService.sendWeatherUpdateEmail(
+      this.weatherHourlyQueueService.sendWeatherUpdateEmail(
         subscription,
         weather!,
       );
@@ -63,7 +65,7 @@ export class WeatherSchedulerService {
 
     subscribedUsers.forEach((subscription) => {
       const weather = weatherByCity.get(subscription.city);
-      this.mailWeatherQueueService.sendWeatherUpdateEmail(
+      this.weatherHourlyQueueService.sendWeatherUpdateEmail(
         subscription,
         weather!,
       );
@@ -90,7 +92,7 @@ export class WeatherSchedulerService {
 
     subscribedUsers.forEach((subscription) => {
       const weather = weatherByCity.get(subscription.city)!;
-      this.mailWeatherQueueService.sendWeatherUpdateEmail(
+      this.weatherDailyQueueService.sendWeatherUpdateEmail(
         subscription,
         weather,
       );

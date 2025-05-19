@@ -3,10 +3,10 @@ import { QUEUE_NAMES } from '../constants';
 import { Job } from 'bullmq';
 import { MailService } from '../../infrastructure/mail/services/mail.service';
 import { MailFactory } from '../../infrastructure/mail/factory/mail.factory';
-import { MailWeatherQueueJobData } from './mail-weather.queue.types';
+import { MailWeatherQueueJobData } from './weather.queue.types';
 
-@Processor(QUEUE_NAMES.MAIL_WEATHER)
-export class MailWeatherQueueProcessor extends WorkerHost {
+@Processor(QUEUE_NAMES.MAIL_WEATHER_DAILY)
+export class WeatherDailyQueueProcessor extends WorkerHost {
   private mailFactory = new MailFactory();
 
   constructor(private readonly mailService: MailService) {

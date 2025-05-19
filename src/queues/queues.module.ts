@@ -1,13 +1,15 @@
 import { Module } from '@nestjs/common';
-import { MailWeatherQueuesModule } from './mail-weather/mail-weather.queue.module';
+import { WeatherDailyQueuesModule } from './mail-weather/weather-daily.queue.module';
 import { MailConfirmationQueuesModule } from './mail-confirmation/mail-confirmation.queue.module';
 import { BullBoardModule } from '@bull-board/nestjs';
 import { ExpressAdapter } from '@bull-board/express';
 import basicAuth from 'express-basic-auth';
+import { WeatherHourlyQueuesModule } from './mail-weather/weather-hourly.queue.module';
 
 @Module({
   imports: [
-    MailWeatherQueuesModule,
+    WeatherDailyQueuesModule,
+    WeatherHourlyQueuesModule,
     MailConfirmationQueuesModule,
     BullBoardModule.forRoot({
       route: '/queues',
