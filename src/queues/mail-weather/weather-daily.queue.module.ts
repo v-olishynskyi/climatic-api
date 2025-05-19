@@ -16,8 +16,6 @@ import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
       name: QUEUE_NAMES.MAIL_WEATHER_DAILY,
       imports: [AppConfigModule],
       useFactory: (configService: AppConfigService) => {
-        console.log('HOST', configService.get('redis.REDIS_HOST'));
-
         return {
           connection: {
             host: configService.get('redis.REDIS_HOST'),

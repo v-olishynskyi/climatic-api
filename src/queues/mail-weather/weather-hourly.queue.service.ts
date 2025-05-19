@@ -13,12 +13,12 @@ export class WeatherHourlyQueueService {
     private readonly mailQueue: Queue<MailWeatherQueueJobData>,
   ) {}
 
-  async sendWeatherUpdateEmail(
+  async enqueueHourlyWeather(
     subscription: Subscription,
     weather: WeatherByCityDto,
   ) {
     await this.mailQueue.add(
-      'sendWeatherUpdate',
+      'sendHourlyWeatherUpdate',
       { subscription, weather },
       {
         attempts: 5,

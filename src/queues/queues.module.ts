@@ -5,6 +5,7 @@ import { BullBoardModule } from '@bull-board/nestjs';
 import { ExpressAdapter } from '@bull-board/express';
 import basicAuth from 'express-basic-auth';
 import { WeatherHourlyQueuesModule } from './mail-weather/weather-hourly.queue.module';
+import { WeatherQueueDispatcher } from './mail-weather/weather-queue-dispatcher.service';
 
 @Module({
   imports: [
@@ -20,5 +21,7 @@ import { WeatherHourlyQueuesModule } from './mail-weather/weather-hourly.queue.m
       }),
     }),
   ],
+  providers: [WeatherQueueDispatcher],
+  exports: [WeatherQueueDispatcher],
 })
 export class QueuesModule {}

@@ -13,12 +13,12 @@ export class WeatherDailyQueueService {
     private readonly mailQueue: Queue<MailWeatherQueueJobData>,
   ) {}
 
-  async sendWeatherUpdateEmail(
+  async enqueueDailyWeather(
     subscription: Subscription,
     weather: WeatherByCityDto,
   ) {
     await this.mailQueue.add(
-      'sendWeatherUpdate',
+      'sendDailyWeatherUpdate',
       { subscription, weather },
       {
         attempts: 5,

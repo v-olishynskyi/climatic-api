@@ -8,6 +8,7 @@ import { SubscriptionService } from '../../modules/subscription/services/subscri
 import { MailConfirmationQueuesModule } from '../../queues/mail-confirmation/mail-confirmation.queue.module';
 import { WeatherModule } from '../weather/weather.module';
 import { WeatherHourlyQueuesModule } from '../../queues/mail-weather/weather-hourly.queue.module';
+import { WeatherQueueDispatcher } from '../../queues/mail-weather/weather-queue-dispatcher.service';
 
 @Module({
   imports: [
@@ -20,6 +21,10 @@ import { WeatherHourlyQueuesModule } from '../../queues/mail-weather/weather-hou
     WeatherDailyQueuesModule,
     WeatherHourlyQueuesModule,
   ],
-  providers: [SubscriptionService, WeatherSchedulerService],
+  providers: [
+    SubscriptionService,
+    WeatherSchedulerService,
+    WeatherQueueDispatcher,
+  ],
 })
 export class SchedulerModule {}
