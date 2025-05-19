@@ -5,10 +5,11 @@ ENV NODE_ENV=development
 WORKDIR /var/www/application
 
 COPY package*.json ./
+
 RUN npm ci
 
 COPY . .
 
 EXPOSE 3000
 
-CMD ["npm", "run", "start:dev"]
+CMD npm run migration:run && npm run start:dev
