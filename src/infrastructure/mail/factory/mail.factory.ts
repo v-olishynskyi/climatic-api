@@ -1,5 +1,4 @@
 import { ISendMailOptions } from '@nestjs-modules/mailer';
-import { SubscribeWeatherUpdatesDto } from '../../../modules/subscription/dto';
 import { generateSubscribeUrl } from '../../../shared/helpers/url.helper';
 import { Subscription } from '../../../modules/subscription/entities/subsciption.entity';
 import { GetWeatherByCityDto } from '../../weather/dto/get-weather.dto';
@@ -11,17 +10,16 @@ export class MailFactory {
   };
 
   public createSubscriptionConfirmationMail(
-    inputDto: SubscribeWeatherUpdatesDto,
-    subscriptionToken: string,
+    subsciption: Subscription,
   ): ISendMailOptions {
     return {
       template: this.TEMPLATE.SUBSCRIPTION_CONFIRMATION,
-      to: inputDto.email,
+      to: subsciption.email,
       subject: 'Weather updates subscription confirmation',
       context: {
-        city: inputDto.city,
-        confirmUrl: generateSubscribeUrl(subscriptionToken),
-        frequency: inputDto.frequency,
+        city: subsciption.city,
+        confirmUrl: generateSubscribeUrl(subsciption.subscription_token),
+        frequency: subsciption.frequency,
       },
     };
   }

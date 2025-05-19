@@ -5,21 +5,15 @@ import { Queue } from 'bullmq';
 import { Subscription } from '../../modules/subscription/entities/subsciption.entity';
 
 @Injectable()
-export class MailQueueService {
+export class MailConfirmationQueueService {
   constructor(
-    @InjectQueue(QUEUE_NAMES.MAIL)
+    @InjectQueue(QUEUE_NAMES.MAIL_CONFIRMATION)
     private readonly mailQueue: Queue<Subscription>,
   ) {}
 
-  async sendEmail(subscription: Subscription) {
-    const newJob = await this.mailQueue.add(
-      'sendConfirmationEmail',
-      subscription,
-      {
-        attempts: 5,
-      },
-    );
-
-    console.log(newJob);
+  async sendConfirmationEmail(subscription: Subscription) {
+    await this.mailQueue.add('sendConfirmationEmail', subscription, {
+      attempts: 5,
+    });
   }
 }

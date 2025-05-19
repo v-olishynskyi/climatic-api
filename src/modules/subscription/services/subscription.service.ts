@@ -10,8 +10,8 @@ import { CronService } from '../../../infrastructure/schedulers/services/cron.se
 import { InjectRepository } from '@nestjs/typeorm';
 import { Subscription } from '../entities/subsciption.entity';
 import { Repository } from 'typeorm';
-import { createHash } from 'node:crypto';
-import { MailQueueService } from '../../../queues/mail/mail.queue.sevice';
+import { SubscriptionFactory } from '../factory/subscription.factory';
+import { MailConfirmationQueueService } from '../../../queues/mail-confirmation/mail-confirmation.queue.sevice';
 
 @Injectable()
 export class SubscriptionService {
@@ -23,32 +23,24 @@ export class SubscriptionService {
 
     private readonly weatherService: WeatherService,
     private readonly cronService: CronService,
-    private readonly mailQueueService: MailQueueService,
+    private readonly mailConfirmationQueueService: MailConfirmationQueueService,
   ) {}
 
   async subscribeToWeatherUpdates(inputDto: SubscribeWeatherUpdatesDto) {
     // first we need to check if city is correct
     await this.weatherService.getWeather(inputDto.city);
 
-    // generate token for subscription
-    const payloadString = `${inputDto.email}${new Date().getTime()}`;
-    const hash = createHash('sha256');
-    const subscriptionToken = hash.update(payloadString).digest('hex');
-
     // create a new subscription entity
-    const subscription = this.subscriptionRepository.create({
-      email: inputDto.email,
-      city: inputDto.city,
-      frequency: inputDto.frequency,
-      subscription_token: subscriptionToken,
-    });
+    const subscription = this.subscriptionRepository.create(
+      SubscriptionFactory.createSubscription(inputDto),
+    );
 
     try {
       // store the token on db
       await this.subscriptionRepository.save(subscription);
 
       // send email with confirmation link
-      await this.mailQueueService.sendEmail(subscription);
+      this.mailConfirmationQueueService.sendConfirmationEmail(subscription);
     } catch (error) {
       this.logger.error(`Error creating subscription: ${error}`);
       throw new InternalServerErrorException(
@@ -107,9 +99,6 @@ export class SubscriptionService {
         'Error deleting subscription. Try again',
       );
     }
-
-    // stop the cron job for this subscription
-    await this.cronService.stopCronTask(subscription.id);
 
     return 'Subscription removed successfully';
   }

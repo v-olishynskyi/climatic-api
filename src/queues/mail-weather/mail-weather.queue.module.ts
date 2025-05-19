@@ -2,8 +2,8 @@ import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 import { AppConfigService } from '../../config/shared-config.service';
 import { AppConfigModule } from '../../config/config.module';
-import { MailQueueService } from './mail.queue.sevice';
-import { MailQueueProcessor } from './mail.queue.processor';
+import { MailWeatherQueueService } from './mail-weather.queue.sevice';
+import { MailWeatherQueueProcessor } from './mail-weather.queue.processor';
 import { QUEUE_NAMES } from '../constants';
 import { MailService } from '../../infrastructure/mail/services/mail.service';
 import { WeatherService } from '../../infrastructure/weather/services/weather.service';
@@ -14,7 +14,7 @@ import { HttpModule } from '@nestjs/axios';
     HttpModule,
     AppConfigModule,
     BullModule.registerQueueAsync({
-      name: QUEUE_NAMES.MAIL,
+      name: QUEUE_NAMES.MAIL_WEATHER,
       imports: [AppConfigModule],
       useFactory: (configService: AppConfigService) => {
         console.log('HOST', configService.get('redis.REDIS_EMAIL_HOST'));
@@ -32,9 +32,9 @@ import { HttpModule } from '@nestjs/axios';
   providers: [
     MailService,
     WeatherService,
-    MailQueueService,
-    MailQueueProcessor,
+    MailWeatherQueueService,
+    MailWeatherQueueProcessor,
   ],
-  exports: [MailQueueService],
+  exports: [MailWeatherQueueService],
 })
-export class MailQueuesModule {}
+export class MailWeatherQueuesModule {}

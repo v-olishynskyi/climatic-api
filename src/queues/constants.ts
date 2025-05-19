@@ -1,3 +1,4 @@
 export const QUEUE_NAMES = {
-  MAIL: 'mmail',
+  MAIL_WEATHER: 'mail-weather',
+  MAIL_CONFIRMATION: 'mail-confirmation',
 };
