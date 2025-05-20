@@ -15,9 +15,9 @@ export class BullBoardController {
 
   constructor(private readonly config: AppConfigService) {
     const connection = {
-      host: config.get('redis.REDIS_HOST'),
-      port: config.get('redis.REDIS_PORT'),
-      password: config.get('redis.REDIS_PASSWORD'),
+      host: this.config.get('redis.REDIS_HOST'),
+      port: this.config.get('redis.REDIS_PORT'),
+      password: this.config.get('redis.REDIS_PASSWORD'),
       tls: {},
     };
 
