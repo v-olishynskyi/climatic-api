@@ -1,9 +1,9 @@
 // src/main.worker.ts
 import { NestFactory } from '@nestjs/core';
-import { WorkerModule } from './src/queues/worker.module';
+import { WorkerModule } from './queues/worker.module';
 
 async function bootstrap() {
-  const app = await NestFactory.createApplicationContext(WorkerModule, {
+  await NestFactory.createApplicationContext(WorkerModule, {
     logger: ['log', 'warn', 'error', 'debug'],
   });
 
