@@ -6,12 +6,12 @@ import { WeatherDailyQueueService } from './weather-daily.queue.service';
 import { WeatherDailyQueueProcessor } from './weather-daily.queue.processor';
 import { QUEUE_NAMES, QUEUES_DB } from '../constants';
 import { MailService } from '../../infrastructure/mail/services/mail.service';
-import { BullBoardModule } from '@bull-board/nestjs';
-import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
+import { MailModule } from '../../infrastructure/mail/mail.module';
 
 @Module({
   imports: [
     AppConfigModule,
+    MailModule,
     BullModule.registerQueueAsync({
       name: QUEUE_NAMES.MAIL_WEATHER_DAILY,
       imports: [AppConfigModule],
@@ -25,10 +25,6 @@ import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
         };
       },
       inject: [AppConfigService],
-    }),
-    BullBoardModule.forFeature({
-      name: QUEUE_NAMES.MAIL_WEATHER_DAILY,
-      adapter: BullMQAdapter, //or use BullAdapter if you're using bull instead of bullMQ
     }),
   ],
   providers: [

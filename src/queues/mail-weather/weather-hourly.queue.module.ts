@@ -4,14 +4,14 @@ import { AppConfigService } from '../../config/shared-config.service';
 import { AppConfigModule } from '../../config/config.module';
 import { QUEUE_NAMES, QUEUES_DB } from '../constants';
 import { MailService } from '../../infrastructure/mail/services/mail.service';
-import { BullBoardModule } from '@bull-board/nestjs';
-import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { WeatherHourlyQueueService } from './weather-hourly.queue.service';
 import { WeatherHourlyQueueProcessor } from './weather-hourly.queue.processor';
+import { MailModule } from '../../infrastructure/mail/mail.module';
 
 @Module({
   imports: [
     AppConfigModule,
+    MailModule,
     BullModule.registerQueueAsync({
       name: QUEUE_NAMES.MAIL_WEATHER_HOURLY,
       imports: [AppConfigModule],
@@ -23,10 +23,6 @@ import { WeatherHourlyQueueProcessor } from './weather-hourly.queue.processor';
         },
       }),
       inject: [AppConfigService],
-    }),
-    BullBoardModule.forFeature({
-      name: QUEUE_NAMES.MAIL_WEATHER_HOURLY,
-      adapter: BullMQAdapter, //or use BullAdapter if you're using bull instead of bullMQ
     }),
   ],
   providers: [

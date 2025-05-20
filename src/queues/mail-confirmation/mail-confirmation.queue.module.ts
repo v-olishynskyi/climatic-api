@@ -6,12 +6,12 @@ import { MailConfirmationQueueService } from './mail-confirmation.queue.service'
 import { MailQueueProcessor } from './mail-confirmation.queue.processor';
 import { QUEUE_NAMES, QUEUES_DB } from '../constants';
 import { MailService } from '../../infrastructure/mail/services/mail.service';
-import { BullBoardModule } from '@bull-board/nestjs';
-import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
+import { MailModule } from '../../infrastructure/mail/mail.module';
 
 @Module({
   imports: [
     AppConfigModule,
+    MailModule,
     BullModule.registerQueueAsync({
       name: QUEUE_NAMES.MAIL_CONFIRMATION,
       imports: [AppConfigModule],
@@ -25,10 +25,6 @@ import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
         };
       },
       inject: [AppConfigService],
-    }),
-    BullBoardModule.forFeature({
-      name: QUEUE_NAMES.MAIL_CONFIRMATION,
-      adapter: BullMQAdapter, //or use BullAdapter if you're using bull instead of bullMQ
     }),
   ],
   providers: [MailService, MailConfirmationQueueService, MailQueueProcessor],
