@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "📡 Waiting for PostgreSQL to be ready..."
-until pg_isready -h "$DB_HOST" -U "$DB_USERNAME" -d "$DB_NAME"; do
+until pg_isready -h "$POSTGRES_HOST" -U "$POSTGRES_USER" -d "$POSTGRES_DB"; do
   echo "⏳ Waiting for database..."
   sleep 2
 done
