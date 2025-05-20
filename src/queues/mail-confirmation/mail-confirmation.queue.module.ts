@@ -16,11 +16,18 @@ import { MailModule } from '../../infrastructure/mail/mail.module';
       name: QUEUE_NAMES.MAIL_CONFIRMATION,
       imports: [AppConfigModule],
       useFactory: (configService: AppConfigService) => {
+        console.log('MailConfirmationQueuesModule', {
+          host: configService.get('redis.REDIS_HOST'),
+          port: configService.get('redis.REDIS_PORT'),
+          db: QUEUES_DB.MAIL_CONFIRMATION,
+        });
+
         return {
           connection: {
             host: configService.get('redis.REDIS_HOST'),
             port: configService.get('redis.REDIS_PORT'),
             db: QUEUES_DB.MAIL_CONFIRMATION,
+            ...(process.env.NODE_END === 'production' ? { tls: {} } : {}),
           },
         };
       },

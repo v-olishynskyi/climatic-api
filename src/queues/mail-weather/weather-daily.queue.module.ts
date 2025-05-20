@@ -16,11 +16,17 @@ import { MailModule } from '../../infrastructure/mail/mail.module';
       name: QUEUE_NAMES.MAIL_WEATHER_DAILY,
       imports: [AppConfigModule],
       useFactory: (configService: AppConfigService) => {
+        console.log('WeatherDailyQueuesModule', {
+          host: configService.get('redis.REDIS_HOST'),
+          port: configService.get('redis.REDIS_PORT'),
+          db: QUEUES_DB.MAIL_CONFIRMATION,
+        });
         return {
           connection: {
             host: configService.get('redis.REDIS_HOST'),
             port: configService.get('redis.REDIS_PORT'),
             db: QUEUES_DB.MAIL_WEATHER_DAILY,
+            ...(process.env.NODE_END === 'production' ? { tls: {} } : {}),
           },
         };
       },

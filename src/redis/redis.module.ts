@@ -11,6 +11,11 @@ import { REDIS_CLIENT } from './constants';
     {
       provide: REDIS_CLIENT,
       useFactory: (configService: AppConfigService) => {
+        console.log('RedisModule', {
+          host: configService.get('redis.REDIS_HOST'),
+          port: configService.get('redis.REDIS_PORT'),
+          password: configService.get('redis.REDIS_PASSWORD'),
+        });
         return new Redis({
           host: configService.get('redis.REDIS_HOST'),
           port: configService.get('redis.REDIS_PORT'),

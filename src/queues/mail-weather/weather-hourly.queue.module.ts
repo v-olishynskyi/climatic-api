@@ -15,13 +15,22 @@ import { MailModule } from '../../infrastructure/mail/mail.module';
     BullModule.registerQueueAsync({
       name: QUEUE_NAMES.MAIL_WEATHER_HOURLY,
       imports: [AppConfigModule],
-      useFactory: (configService: AppConfigService) => ({
-        connection: {
+      useFactory: (configService: AppConfigService) => {
+        console.log('WeatherHourlyQueuesModule', {
           host: configService.get('redis.REDIS_HOST'),
           port: configService.get('redis.REDIS_PORT'),
-          db: QUEUES_DB.MAIL_WEATHER_HOURLY,
-        },
-      }),
+          db: QUEUES_DB.MAIL_CONFIRMATION,
+        });
+
+        return {
+          connection: {
+            host: configService.get('redis.REDIS_HOST'),
+            port: configService.get('redis.REDIS_PORT'),
+            db: QUEUES_DB.MAIL_WEATHER_HOURLY,
+            ...(process.env.NODE_END === 'production' ? { tls: {} } : {}),
+          },
+        };
+      },
       inject: [AppConfigService],
     }),
   ],
