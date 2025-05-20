@@ -15,6 +15,7 @@ FROM node:20-alpine
 ENV NODE_ENV=production
 
 WORKDIR /app
+RUN apk add --no-cache postgresql-client
 
 # Копіюємо лише необхідне для запуску
 COPY --from=builder /app/dist ./dist
