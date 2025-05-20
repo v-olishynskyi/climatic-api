@@ -15,7 +15,7 @@ import { REDIS_CLIENT } from './constants';
           host: configService.get('redis.REDIS_HOST'),
           port: configService.get('redis.REDIS_PORT'),
           password: configService.get('redis.REDIS_PASSWORD'),
-          tls: {},
+          ...(process.env.NODE_END === 'production' ? { tls: {} } : {}),
         });
       },
       inject: [AppConfigService],

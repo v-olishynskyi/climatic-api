@@ -30,4 +30,5 @@ export const AppDataSource = new DataSource({
       ? path.join(__dirname, './migrations/*.js')
       : path.join(__dirname, './migrations/*.ts'),
   ],
+  schema: 'public',
 });
