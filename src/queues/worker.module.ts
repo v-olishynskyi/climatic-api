@@ -2,8 +2,8 @@
 import { Module } from '@nestjs/common';
 import { AppConfigModule } from '../config/config.module';
 import { MailConfirmationQueuesModule } from './mail-confirmation/mail-confirmation.queue.module';
-import { WeatherDailyQueuesModule } from './mail-weather/weather-daily.queue.module';
-import { WeatherHourlyQueuesModule } from './mail-weather/weather-hourly.queue.module';
+import { WeatherDailyQueuesModule } from './mail-weather/daily/weather-daily.queue.module';
+import { WeatherHourlyQueuesModule } from './mail-weather/hourly/weather-hourly.queue.module';
 import { ConfigModule } from '@nestjs/config';
 import configurations from '../config';
 

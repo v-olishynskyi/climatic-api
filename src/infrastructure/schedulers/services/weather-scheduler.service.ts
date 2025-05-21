@@ -17,14 +17,14 @@ export class WeatherSchedulerService {
     private readonly subscriptionService: SubscriptionService,
   ) {}
 
-  async getUsersByFrequenctWithCityWeather(): Promise<{
+  async getUsersByFrequenctWithCityWeather(
+    frequency: FrequencyUpdatesEnum,
+  ): Promise<{
     subscribedUsers: Subscription[];
     weatherByCity: Map<string, WeatherByCityDto>;
   }> {
     const subscribedUsers =
-      await this.subscriptionService.getAllSubscriptionsByFrequency(
-        FrequencyUpdatesEnum.HOURLY,
-      );
+      await this.subscriptionService.getAllSubscriptionsByFrequency(frequency);
 
     const uniqueCities = [...new Set(subscribedUsers.map((user) => user.city))];
 
@@ -42,12 +42,32 @@ export class WeatherSchedulerService {
 
   @Cron('30 * * * * *')
   async DEV_ONLY__30secWeatherUpdateCronJob() {
-    if (process.env.NODE_ENV !== 'development') {
-      return;
-    }
+    // if (process.env.NODE_ENV !== 'development') {
+    //   return;
+    // }
 
     const { subscribedUsers, weatherByCity } =
-      await this.getUsersByFrequenctWithCityWeather();
+      await this.getUsersByFrequenctWithCityWeather(
+        FrequencyUpdatesEnum.HOURLY,
+      );
+
+    subscribedUsers.forEach((subscription) => {
+      const weather = weatherByCity.get(subscription.city);
+      this.weatherQueueDispatcher.dispatchWeatherUpdateEmail(
+        subscription,
+        weather!,
+      );
+    });
+  }
+
+  @Cron('45 * * * * *')
+  async DEV_ONLY__45secWeatherUpdateCronJob() {
+    // if (process.env.NODE_ENV !== 'development') {
+    //   return;
+    // }
+
+    const { subscribedUsers, weatherByCity } =
+      await this.getUsersByFrequenctWithCityWeather(FrequencyUpdatesEnum.DAILY);
 
     subscribedUsers.forEach((subscription) => {
       const weather = weatherByCity.get(subscription.city);
@@ -61,7 +81,9 @@ export class WeatherSchedulerService {
   @Cron('0 0 * * * *')
   async hourlyWeatherUpdateCronJob() {
     const { subscribedUsers, weatherByCity } =
-      await this.getUsersByFrequenctWithCityWeather();
+      await this.getUsersByFrequenctWithCityWeather(
+        FrequencyUpdatesEnum.HOURLY,
+      );
 
     subscribedUsers.forEach((subscription) => {
       const weather = weatherByCity.get(subscription.city);
@@ -75,7 +97,7 @@ export class WeatherSchedulerService {
   @Cron('0 07 * * *')
   async dailyWeatherUpdateCronJob() {
     const { subscribedUsers, weatherByCity } =
-      await this.getUsersByFrequenctWithCityWeather();
+      await this.getUsersByFrequenctWithCityWeather(FrequencyUpdatesEnum.DAILY);
 
     subscribedUsers.forEach((subscription) => {
       const weather = weatherByCity.get(subscription.city)!;

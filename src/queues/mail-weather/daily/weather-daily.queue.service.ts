@@ -1,10 +1,10 @@
 import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable } from '@nestjs/common';
-import { QUEUE_NAMES } from '../constants';
+import { QUEUE_NAMES } from '../../constants';
 import { Queue } from 'bullmq';
-import { Subscription } from '../../modules/subscription/entities/subsciption.entity';
-import { MailWeatherQueueJobData } from './weather.queue.types';
-import { WeatherByCityDto } from '../../infrastructure/weather/dto/get-weather.dto';
+import { Subscription } from '../../../modules/subscription/entities/subsciption.entity';
+import { MailWeatherQueueJobData } from '../weather.queue.types';
+import { WeatherByCityDto } from '../../../infrastructure/weather/dto/get-weather.dto';
 
 @Injectable()
 export class WeatherDailyQueueService {
@@ -22,6 +22,7 @@ export class WeatherDailyQueueService {
       { subscription, weather },
       {
         attempts: 5,
+        removeOnComplete: false,
       },
     );
   }

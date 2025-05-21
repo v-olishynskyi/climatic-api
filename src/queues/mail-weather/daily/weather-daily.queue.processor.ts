@@ -1,9 +1,9 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
-import { QUEUE_NAMES } from '../constants';
+import { QUEUE_NAMES } from '../../constants';
 import { Job } from 'bullmq';
-import { MailService } from '../../infrastructure/mail/services/mail.service';
-import { MailFactory } from '../../infrastructure/mail/factory/mail.factory';
-import { MailWeatherQueueJobData } from './weather.queue.types';
+import { MailService } from '../../../infrastructure/mail/services/mail.service';
+import { MailFactory } from '../../../infrastructure/mail/factory/mail.factory';
+import { MailWeatherQueueJobData } from '../weather.queue.types';
 
 @Processor(QUEUE_NAMES.MAIL_WEATHER_DAILY)
 export class WeatherDailyQueueProcessor extends WorkerHost {

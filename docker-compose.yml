@@ -18,6 +18,7 @@ services:
 
   redis:
     image: redis
+    container_name: climatic_redis_dev
     ports:
       - '6379:6379'
 

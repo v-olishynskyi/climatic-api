@@ -1,9 +1,9 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
-import { QUEUE_NAMES } from '../constants';
 import { Job } from 'bullmq';
-import { MailService } from '../../infrastructure/mail/services/mail.service';
-import { MailFactory } from '../../infrastructure/mail/factory/mail.factory';
-import { MailWeatherQueueJobData } from './weather.queue.types';
+import { QUEUE_NAMES } from '../../constants';
+import { MailFactory } from '../../../infrastructure/mail/factory/mail.factory';
+import { MailService } from '../../../infrastructure/mail/services/mail.service';
+import { MailWeatherQueueJobData } from '../weather.queue.types';
 
 @Processor(QUEUE_NAMES.MAIL_WEATHER_HOURLY)
 export class WeatherHourlyQueueProcessor extends WorkerHost {
@@ -14,6 +14,7 @@ export class WeatherHourlyQueueProcessor extends WorkerHost {
   }
 
   async process(job: Job<MailWeatherQueueJobData>): Promise<any> {
+    console.log('enqueueHourlyWeather process', job);
     await this.mailService.sendEmail(
       this.mailFactory.createWeatherUpdateMail(
         job.data.subscription,

@@ -14,6 +14,7 @@ export class MailConfirmationQueueService {
   async sendConfirmationEmail(subscription: Subscription) {
     await this.mailQueue.add('sendConfirmationEmail', subscription, {
       attempts: 5,
+      removeOnComplete: false,
     });
   }
 }

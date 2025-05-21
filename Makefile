@@ -5,8 +5,14 @@ dev-up:
 dev-down:
 	docker-compose -f docker-compose.yml down
 
-dev-logs:
+dev-logs-api:
 	docker-compose -f docker-compose.yml logs -f api
+
+dev-logs-postgres:
+	docker-compose -f docker-compose.yml logs -f postgres
+
+dev-logs-redis:
+	docker-compose -f docker-compose.yml logs -f redis
 
 dev-sh:
 	docker-compose -f docker-compose.yml exec api sh
@@ -18,8 +24,14 @@ prod-up:
 prod-down:
 	docker-compose -f docker-compose.prod.yml down
 
-prod-logs:
+prod-logs-api:
 	docker-compose -f docker-compose.prod.yml logs -f api
+
+prod-logs-db:
+	docker-compose -f docker-compose.prod.yml logs -f postgres
+
+prod-logs-redis:
+	docker-compose -f docker-compose.prod.yml logs -f redis
 
 prod-sh:
 	docker-compose -f docker-compose.prod.yml exec api sh

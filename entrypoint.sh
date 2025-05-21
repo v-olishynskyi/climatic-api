@@ -10,5 +10,7 @@ echo "📦 Running migrations..."
 npx typeorm migration:run -d dist/infrastructure/database/typeorm.config.js
 echo "✅ Migrations finished"
 
+ls -la dist/
+echo "✅ Entry script completed. Running Node..."
 echo "🚀 Starting NestJS application..."
 node dist/main.js

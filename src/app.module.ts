@@ -10,7 +10,6 @@ import { JwtTokenModule } from './shared/infrastructure/jwt.module';
 import { DatabaseModule } from './infrastructure/database/database.module';
 import { QueuesModule } from './queues/queues.module';
 import { RedisModule } from './redis/redis.module';
-import { BullBoardModule } from '@bull-board/nestjs';
 
 @Module({
   imports: [
@@ -26,7 +25,6 @@ import { BullBoardModule } from '@bull-board/nestjs';
     MailModule,
     WeatherModule,
     SubscriptionModule,
-    BullBoardModule,
   ],
   controllers: [],
   providers: [],
