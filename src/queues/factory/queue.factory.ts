@@ -1,11 +1,12 @@
 import { RegisterQueueAsyncOptions } from '@nestjs/bullmq';
-import { QUEUE_CONFIG, QUEUE_NAMES } from '../constants';
+import { QUEUE_CONFIG } from '../constants';
 import { AppConfigService } from '../../config/shared-config.service';
 import { AppConfigModule } from '../../config/config.module';
+import { QueueNamesEnum } from '../enum';
 
 export class QueueFactory {
   public static createQueueRegistrations(
-    queueName: QUEUE_NAMES,
+    queueName: QueueNamesEnum,
     restOptions?: Omit<
       RegisterQueueAsyncOptions,
       'name' | 'useFactory' | 'inject'
@@ -24,6 +25,7 @@ export class QueueFactory {
             ...(process.env.NODE_ENV === 'production' ? { tls: {} } : {}),
           },
           prefix: QUEUE_CONFIG[queueName].prefix,
+          skipVersionCheck: true,
         };
       },
       inject: [AppConfigService],

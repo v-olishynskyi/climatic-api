@@ -1,8 +1,8 @@
 import { ExpressAdapter } from '@bull-board/express';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { Queue } from 'bullmq';
-import { QUEUE_NAMES, QUEUE_PREFIX } from './queues/constants';
 import { createBullBoard } from '@bull-board/api';
+import { QueueNamesEnum, QueuePrefixEnum } from './queues/enum';
 
 export default function setupBullBoard(app) {
   const serverAdapter = new ExpressAdapter();
@@ -17,21 +17,21 @@ export default function setupBullBoard(app) {
 
   const queues = [
     new BullMQAdapter(
-      new Queue(QUEUE_NAMES.MAIL_CONFIRMATION, {
+      new Queue(QueueNamesEnum.MAIL_CONFIRMATION, {
         connection,
-        prefix: QUEUE_PREFIX.MAIL_CONFIRMATION,
+        prefix: QueuePrefixEnum.MAIL_CONFIRMATION,
       }),
     ),
     new BullMQAdapter(
-      new Queue(QUEUE_NAMES.MAIL_WEATHER_HOURLY, {
+      new Queue(QueueNamesEnum.MAIL_WEATHER_HOURLY, {
         connection,
-        prefix: QUEUE_PREFIX.MAIL_WEATHER_HOURLY,
+        prefix: QueuePrefixEnum.MAIL_WEATHER_HOURLY,
       }),
     ),
     new BullMQAdapter(
-      new Queue(QUEUE_NAMES.MAIL_WEATHER_DAILY, {
+      new Queue(QueueNamesEnum.MAIL_WEATHER_DAILY, {
         connection,
-        prefix: QUEUE_PREFIX.MAIL_WEATHER_DAILY,
+        prefix: QueuePrefixEnum.MAIL_WEATHER_DAILY,
       }),
     ),
   ];

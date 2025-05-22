@@ -6,14 +6,14 @@ import { MailQueueProcessor } from './mail-confirmation.queue.processor';
 import { MailService } from '../../infrastructure/mail/services/mail.service';
 import { MailModule } from '../../infrastructure/mail/mail.module';
 import { QueueFactory } from '../factory/queue.factory';
-import { QUEUE_NAMES } from '../constants';
+import { QueueNamesEnum } from '../enum';
 
 @Module({
   imports: [
     AppConfigModule,
     MailModule,
     BullModule.registerQueueAsync(
-      QueueFactory.createQueueRegistrations(QUEUE_NAMES.MAIL_CONFIRMATION),
+      QueueFactory.createQueueRegistrations(QueueNamesEnum.MAIL_CONFIRMATION),
     ),
   ],
   providers: [MailService, MailConfirmationQueueService, MailQueueProcessor],

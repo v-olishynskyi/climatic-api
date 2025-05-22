@@ -1,4 +1,4 @@
-import { QUEUE_NAMES } from './constants';
+import { QueueNamesEnum } from './enum';
 
 export type QueueConnectionOptions = {
   name: string;
@@ -6,4 +6,4 @@ export type QueueConnectionOptions = {
   prefix: string;
 };
 
-export type QueueConfig = Record<QUEUE_NAMES, QueueConnectionOptions>;
+export type QueueConfig = Record<QueueNamesEnum, QueueConnectionOptions>;

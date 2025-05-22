@@ -3,7 +3,7 @@ import { Module } from '@nestjs/common';
 import { AppConfigModule } from '../../../config/config.module';
 import { MailModule } from '../../../infrastructure/mail/mail.module';
 import { QueueFactory } from '../../factory/queue.factory';
-import { QUEUE_NAMES } from '../../constants';
+import { QueueNamesEnum } from '../../enum';
 import { MailService } from '../../../infrastructure/mail/services/mail.service';
 import { WeatherDailyQueueService } from './weather-daily.queue.service';
 import { WeatherDailyQueueProcessor } from './weather-daily.queue.processor';
@@ -13,7 +13,7 @@ import { WeatherDailyQueueProcessor } from './weather-daily.queue.processor';
     AppConfigModule,
     MailModule,
     BullModule.registerQueueAsync(
-      QueueFactory.createQueueRegistrations(QUEUE_NAMES.MAIL_WEATHER_DAILY),
+      QueueFactory.createQueueRegistrations(QueueNamesEnum.MAIL_WEATHER_DAILY),
     ),
   ],
   providers: [

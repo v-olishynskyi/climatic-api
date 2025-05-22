@@ -1,21 +1,36 @@
-import { Processor, WorkerHost } from '@nestjs/bullmq';
-import { QUEUE_NAMES } from '../constants';
-import { Job } from 'bullmq';
+import { QueueNamesEnum } from '../enum';
+import { Job, Worker } from 'bullmq';
 import { MailService } from '../../infrastructure/mail/services/mail.service';
 import { MailFactory } from '../../infrastructure/mail/factory/mail.factory';
 import { Subscription } from '../../modules/subscription/entities/subsciption.entity';
+import { Injectable, OnModuleInit } from '@nestjs/common';
+import { AppConfigService } from '../../config/shared-config.service';
+import { RedisFactory } from '../../redis/factory/redis.factory';
 
-@Processor(QUEUE_NAMES.MAIL_CONFIRMATION)
-export class MailQueueProcessor extends WorkerHost {
+@Injectable()
+export class MailQueueProcessor implements OnModuleInit {
   private mailFactory = new MailFactory();
 
-  constructor(private readonly mailService: MailService) {
-    super();
-  }
+  constructor(
+    private readonly mailService: MailService,
+    private readonly configService: AppConfigService,
+  ) {}
 
-  async process(job: Job<Subscription>): Promise<any> {
-    await this.mailService.sendEmail(
-      this.mailFactory.createSubscriptionConfirmationMail(job.data),
+  onModuleInit() {
+    const connection = RedisFactory.createRedisConfig(this.configService);
+
+    new Worker(
+      QueueNamesEnum.MAIL_CONFIRMATION,
+      async (job: Job<Subscription>) => {
+        await this.mailService.sendEmail(
+          this.mailFactory.createSubscriptionConfirmationMail(job.data),
+        );
+      },
+      {
+        connection,
+        autorun: true,
+        prefix: QueueNamesEnum.MAIL_CONFIRMATION,
+      },
     );
   }
 }

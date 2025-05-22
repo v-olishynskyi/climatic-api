@@ -4,6 +4,7 @@ import { AppConfigModule } from '../config/config.module';
 import Redis from 'ioredis';
 import { REDIS_CLIENT } from './constants';
 import Debug from 'debug';
+import { RedisFactory } from './factory/redis.factory';
 
 Debug.enable('ioredis:*');
 
@@ -14,12 +15,7 @@ Debug.enable('ioredis:*');
     {
       provide: REDIS_CLIENT,
       useFactory: (configService: AppConfigService) => {
-        return new Redis({
-          host: configService.get('redis.REDIS_HOST'),
-          port: configService.get('redis.REDIS_PORT'),
-          password: configService.get('redis.REDIS_PASSWORD'),
-          ...(process.env.NODE_ENV === 'production' ? { tls: {} } : {}),
-        });
+        return new Redis(RedisFactory.createRedisConfig(configService));
       },
       inject: [AppConfigService],
     },

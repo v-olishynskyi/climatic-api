@@ -1,6 +1,6 @@
 import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable } from '@nestjs/common';
-import { QUEUE_NAMES } from '../../constants';
+import { QueueNamesEnum } from '../../enum';
 import { Queue } from 'bullmq';
 import { Subscription } from '../../../modules/subscription/entities/subsciption.entity';
 import { MailWeatherQueueJobData } from '../weather.queue.types';
@@ -9,7 +9,7 @@ import { WeatherByCityDto } from '../../../infrastructure/weather/dto/get-weathe
 @Injectable()
 export class WeatherDailyQueueService {
   constructor(
-    @InjectQueue(QUEUE_NAMES.MAIL_WEATHER_DAILY)
+    @InjectQueue(QueueNamesEnum.MAIL_WEATHER_DAILY)
     private readonly mailQueue: Queue<MailWeatherQueueJobData>,
   ) {}
 
