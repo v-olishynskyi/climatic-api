@@ -16,8 +16,6 @@ export class WeatherQueueDispatcher {
     subscription: Subscription,
     weather: WeatherByCityDto,
   ) {
-    console.log('dispatchWeatherUpdateEmail', subscription, weather);
-
     if (subscription.frequency === FrequencyUpdatesEnum.HOURLY) {
       await this.weatherHourlyQueueService.enqueueHourlyWeather(
         subscription,

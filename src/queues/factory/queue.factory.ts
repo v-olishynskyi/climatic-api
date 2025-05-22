@@ -19,8 +19,9 @@ export class QueueFactory {
           connection: {
             host: configService.get('redis.REDIS_HOST'),
             port: configService.get('redis.REDIS_PORT'),
+            password: configService.get('redis.REDIS_PASSWORD'),
             db: QUEUE_CONFIG[queueName].db,
-            // ...(process.env.NODE_END === 'production' ? { tls: {} } : {}),
+            ...(process.env.NODE_ENV === 'production' ? { tls: {} } : {}),
           },
           prefix: QUEUE_CONFIG[queueName].prefix,
         };

@@ -17,8 +17,6 @@ export class WeatherHourlyQueueService {
     subscription: Subscription,
     weather: WeatherByCityDto,
   ) {
-    console.log('enqueueHourlyWeather', subscription, weather);
-
     await this.mailQueue.add(
       'sendHourlyWeatherUpdate',
       { subscription, weather },

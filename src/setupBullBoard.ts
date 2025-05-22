@@ -12,9 +12,8 @@ export default function setupBullBoard(app) {
     host: process.env.REDIS_HOST,
     port: +(process.env.REDIS_PORT ?? 6379),
     password: process.env.REDIS_PASSWORD,
-    // tls: {}, // або прибери, якщо не потрібне TLS
+    ...(process.env.NODE_ENV === 'production' ? { tls: {} } : {}),
   };
-  console.log(' setupBullBoard - connection:', connection);
 
   const queues = [
     new BullMQAdapter(

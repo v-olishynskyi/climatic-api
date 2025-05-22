@@ -14,7 +14,6 @@ export class WeatherHourlyQueueProcessor extends WorkerHost {
   }
 
   async process(job: Job<MailWeatherQueueJobData>): Promise<any> {
-    console.log('enqueueHourlyWeather process', job);
     await this.mailService.sendEmail(
       this.mailFactory.createWeatherUpdateMail(
         job.data.subscription,
