@@ -10,6 +10,7 @@ import { JwtTokenModule } from './shared/infrastructure/jwt.module';
 import { DatabaseModule } from './infrastructure/database/database.module';
 import { QueuesModule } from './queues/queues.module';
 import { RedisModule } from './redis/redis.module';
+import { RabbitMQModule } from './queues/rabbitmq/rabbitmq.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { RedisModule } from './redis/redis.module';
     MailModule,
     WeatherModule,
     SubscriptionModule,
+    RabbitMQModule,
   ],
   controllers: [],
   providers: [],

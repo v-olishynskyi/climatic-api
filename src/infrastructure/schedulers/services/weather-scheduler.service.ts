@@ -4,8 +4,8 @@ import { Cron } from '@nestjs/schedule';
 import { SubscriptionService } from '../../../modules/subscription/services/subscription.service';
 import { FrequencyUpdatesEnum } from '../../../modules/subscription/enum';
 import { WeatherByCityDto } from '../../weather/dto/get-weather.dto';
-import { WeatherQueueDispatcher } from '../../../queues/mail-weather/weather-queue-dispatcher.service';
 import { Subscription } from '../../../modules/subscription/entities/subsciption.entity';
+import { WeatherQueueDispatcher } from '../../../queues/rabbitmq/weather-update-mail/weather-queue-dispatcher.service';
 
 @Injectable()
 export class WeatherSchedulerService {
@@ -13,8 +13,8 @@ export class WeatherSchedulerService {
 
   constructor(
     private readonly weatherService: WeatherService,
-    private readonly weatherQueueDispatcher: WeatherQueueDispatcher,
     private readonly subscriptionService: SubscriptionService,
+    private readonly weatherQueueDispatcher: WeatherQueueDispatcher,
   ) {}
 
   async getUsersByFrequenctWithCityWeather(
@@ -42,9 +42,9 @@ export class WeatherSchedulerService {
 
   @Cron('30 * * * * *')
   async DEV_ONLY__30secWeatherUpdateCronJob() {
-    // if (process.env.NODE_ENV !== 'development') {
-    //   return;
-    // }
+    if (process.env.ENABLE_TEST_MODE === 'false') {
+      return;
+    }
 
     const { subscribedUsers, weatherByCity } =
       await this.getUsersByFrequenctWithCityWeather(
@@ -62,9 +62,9 @@ export class WeatherSchedulerService {
 
   @Cron('45 * * * * *')
   async DEV_ONLY__45secWeatherUpdateCronJob() {
-    // if (process.env.NODE_ENV !== 'development') {
-    //   return;
-    // }
+    if (process.env.ENABLE_TEST_MODE === 'false') {
+      return;
+    }
 
     const { subscribedUsers, weatherByCity } =
       await this.getUsersByFrequenctWithCityWeather(FrequencyUpdatesEnum.DAILY);

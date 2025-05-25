@@ -3,10 +3,10 @@ import { AppConfigService } from '../config/shared-config.service';
 import { AppConfigModule } from '../config/config.module';
 import Redis from 'ioredis';
 import { REDIS_CLIENT } from './constants';
-import Debug from 'debug';
+// import Debug from 'debug';
 import { RedisFactory } from './factory/redis.factory';
 
-Debug.enable('ioredis:*');
+// Debug.enable('ioredis:*');
 
 @Global()
 @Module({
