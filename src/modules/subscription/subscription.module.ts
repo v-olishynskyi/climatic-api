@@ -9,15 +9,16 @@ import { JwtTokenService } from '../../shared/services/jwt.service';
 import { JwtTokenModule } from '../../shared/infrastructure/jwt.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Subscription } from './entities/subsciption.entity';
-import { MailConfirmationQueuesModule } from '../../queues/mail-confirmation/mail-confirmation.queue.module';
 import { WeatherModule } from '../../infrastructure/weather/weather.module';
+import { RabbitMQModule } from '../../queues/rabbitmq/rabbitmq.module';
+import { SubscriptionConfirmationMailService } from '../../queues/rabbitmq/subscription-confirmation-mail/subscription-confirmation-mail.service';
 
 @Module({
   imports: [
     HttpModule,
     JwtTokenModule,
     TypeOrmModule.forFeature([Subscription]),
-    MailConfirmationQueuesModule,
+    RabbitMQModule,
     WeatherModule,
   ],
   controllers: [SubscriptionController],
@@ -27,6 +28,7 @@ import { WeatherModule } from '../../infrastructure/weather/weather.module';
     CronService,
     JwtTokenService,
     SubscriptionService,
+    SubscriptionConfirmationMailService,
   ],
   exports: [SubscriptionService, TypeOrmModule],
 })

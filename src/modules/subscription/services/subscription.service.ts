@@ -11,8 +11,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Subscription } from '../entities/subsciption.entity';
 import { Repository } from 'typeorm';
 import { SubscriptionFactory } from '../factory/subscription.factory';
-import { MailConfirmationQueueService } from '../../../queues/mail-confirmation/mail-confirmation.queue.service';
 import { FrequencyUpdatesEnum } from '../enum';
+import { SubscriptionConfirmationMailService } from '../../../queues/rabbitmq/subscription-confirmation-mail/subscription-confirmation-mail.service';
 
 @Injectable()
 export class SubscriptionService {
@@ -22,7 +22,7 @@ export class SubscriptionService {
     @InjectRepository(Subscription)
     private readonly subscriptionRepository: Repository<Subscription>,
     private readonly weatherService: WeatherService,
-    private readonly mailConfirmationQueueService: MailConfirmationQueueService,
+    private readonly subscriptionConfirmationMailService: SubscriptionConfirmationMailService,
   ) {}
 
   async subscribeToWeatherUpdates(inputDto: SubscribeWeatherUpdatesDto) {
@@ -39,7 +39,9 @@ export class SubscriptionService {
       await this.subscriptionRepository.save(subscription);
 
       // send email with confirmation link
-      this.mailConfirmationQueueService.sendConfirmationEmail(subscription);
+      this.subscriptionConfirmationMailService.sendSubscriptionConfirmationMail(
+        subscription,
+      );
     } catch (error) {
       this.logger.error(`Error creating subscription: ${error}`);
       throw new InternalServerErrorException(
@@ -77,7 +79,7 @@ export class SubscriptionService {
       );
     }
 
-    return 'Subscription confirmed successfully';
+    return subscription;
   }
 
   async unsubscribeFromWeatherUpdates(unsubscribeToken: string) {
@@ -104,7 +106,7 @@ export class SubscriptionService {
       );
     }
 
-    return 'Subscription removed successfully';
+    return subscription;
   }
 
   async getAllSubscriptionsByFrequency(

@@ -42,7 +42,10 @@ export class WeatherSchedulerService {
 
   @Cron('30 * * * * *')
   async DEV_ONLY__30secWeatherUpdateCronJob() {
-    if (process.env.ENABLE_TEST_MODE === 'false') {
+    if (
+      !process.env.ENABLE_TEST_MODE ||
+      process.env.ENABLE_TEST_MODE === 'false'
+    ) {
       return;
     }
 
@@ -62,7 +65,10 @@ export class WeatherSchedulerService {
 
   @Cron('45 * * * * *')
   async DEV_ONLY__45secWeatherUpdateCronJob() {
-    if (process.env.ENABLE_TEST_MODE === 'false') {
+    if (
+      !process.env.ENABLE_TEST_MODE ||
+      process.env.ENABLE_TEST_MODE === 'false'
+    ) {
       return;
     }
 

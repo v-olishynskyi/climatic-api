@@ -8,7 +8,6 @@ import { SchedulerModule } from './infrastructure/schedulers/scheduler.module';
 import configurations from './config';
 import { JwtTokenModule } from './shared/infrastructure/jwt.module';
 import { DatabaseModule } from './infrastructure/database/database.module';
-import { QueuesModule } from './queues/queues.module';
 import { RedisModule } from './redis/redis.module';
 import { RabbitMQModule } from './queues/rabbitmq/rabbitmq.module';
 
@@ -19,7 +18,6 @@ import { RabbitMQModule } from './queues/rabbitmq/rabbitmq.module';
       load: configurations,
     }),
     RedisModule,
-    QueuesModule,
     DatabaseModule,
     JwtTokenModule,
     SchedulerModule,
