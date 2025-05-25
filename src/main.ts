@@ -1,15 +1,15 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import setupSwagger from './swagger';
-import setupBullBoard from './setupBullBoard';
 import { Transport } from '@nestjs/microservices';
 import { QueueNamesEnum } from './queues/rabbitmq/enum';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   setupSwagger(app);
-  setupBullBoard(app.getHttpAdapter().getInstance());
 
   app.connectMicroservice({
     transport: Transport.RMQ,
@@ -37,6 +37,11 @@ async function bootstrap() {
       queueOptions: { durable: true },
     },
   });
+
+  app.useStaticAssets(join(__dirname, '..', 'public'));
+  app.setBaseViewsDir(join(__dirname, '..', 'views'));
+
+  app.setViewEngine('ejs');
 
   await app.startAllMicroservices();
 

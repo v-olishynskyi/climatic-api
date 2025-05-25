@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Post,
+  Res,
   UseInterceptors,
   UsePipes,
   ValidationPipe,
@@ -21,6 +22,7 @@ import {
 } from '@nestjs/swagger';
 import { SubscribeWeatherUpdatesDto } from '../dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { Response } from 'express';
 @Controller('')
 export class SubscriptionController {
   constructor(private readonly subscriptionService: SubscriptionService) {}
@@ -78,8 +80,16 @@ export class SubscriptionController {
     type: String,
   })
   @Get('/confirm/:token')
-  confirmSubscription(@Param('token') token: string): Promise<string> {
-    return this.subscriptionService.confirmSubscription(token);
+  async confirmSubscription(
+    @Param('token') token: string,
+    @Res() res: Response,
+  ): Promise<void> {
+    const subsciption =
+      await this.subscriptionService.confirmSubscription(token);
+    return res.render('confirm-subscription', {
+      city: subsciption.city,
+      frequency: subsciption.frequency,
+    });
   }
 
   @ApiOperation({
@@ -97,9 +107,16 @@ export class SubscriptionController {
     description: 'Token not found',
   })
   @Get('/unsubscribe/:token')
-  unsubscribeFromWeatherUpdates(
+  async unsubscribeFromWeatherUpdates(
     @Param('token') token: string,
-  ): Promise<string> {
-    return this.subscriptionService.unsubscribeFromWeatherUpdates(token);
+    @Res() res: Response,
+  ): Promise<void> {
+    const subsciption =
+      await this.subscriptionService.unsubscribeFromWeatherUpdates(token);
+
+    return res.render('unsubscribe-confirmation', {
+      city: subsciption.city,
+      frequency: subsciption.frequency,
+    });
   }
 }
