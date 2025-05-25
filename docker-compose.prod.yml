@@ -46,6 +46,48 @@ services:
     volumes:
       - redis_data_prod:/data
 
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    restart: unless-stopped
+    ports:
+      - '5672:5672' # AMQP
+      - '15672:15672' # Web UI
+    env_file:
+      - .env.prod
+    volumes:
+      - rabbitmqdata_prod:/var/lib/rabbitmq
+
+  # Мікросервіс підтвердження підписки
+  subscription_confirmation_worker:
+    container_name: subscription_confirmation_worker
+    build:
+      context: .
+      dockerfile: Dockerfile_worker
+    command: ['node', 'dist/rabbitmq.subscription-confirmation.main.js']
+    depends_on:
+      - rabbitmq
+
+  # Мікросервіс для щоденної розсилки
+  weather_daily_worker:
+    container_name: weather_daily_worker
+    build:
+      context: .
+      dockerfile: Dockerfile_worker
+    command: ['node', 'dist/rabbitmq.weather-daily.main.js']
+    depends_on:
+      - rabbitmq
+
+  # Мікросервіс для погодинної розсилки
+  weather_hourly_worker:
+    container_name: weather_hourly_worker
+    build:
+      context: .
+      dockerfile: Dockerfile_worker
+    command: ['node', 'dist/rabbitmq.weather-hourly.main.js']
+    depends_on:
+      - rabbitmq
+
 volumes:
   pg_data_prod:
   redis_data_prod:
+  rabbitmqdata_prod:

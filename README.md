@@ -66,7 +66,6 @@ API URL: https://climatic-api.onrender.com
 
 ## 🚀 Швидкий старт
 
-
 ## 🔐 Налаштувати .env змінні (dev)
 
 ```env
@@ -92,7 +91,6 @@ JWT_SECRET=supersecretstring
 
 BASE_URL=http://localhost:3000
 
-BULL_BOARD_PASSWORD=your_dashboard_password
 ```
 
 ### 🔧 Запуск через Docker

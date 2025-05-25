@@ -9,7 +9,6 @@ import configurations from './config';
 import { JwtTokenModule } from './shared/infrastructure/jwt.module';
 import { DatabaseModule } from './infrastructure/database/database.module';
 import { RedisModule } from './redis/redis.module';
-import { RabbitMQModule } from './queues/rabbitmq/rabbitmq.module';
 
 @Module({
   imports: [
@@ -24,7 +23,6 @@ import { RabbitMQModule } from './queues/rabbitmq/rabbitmq.module';
     MailModule,
     WeatherModule,
     SubscriptionModule,
-    RabbitMQModule,
   ],
   controllers: [],
   providers: [],

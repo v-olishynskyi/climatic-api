@@ -1,4 +1,4 @@
-# ───── STAGE 1: build ─────
+# ===== STAGE 1: build =====
 FROM node:20-alpine AS builder
 
 WORKDIR /app
@@ -11,7 +11,7 @@ COPY . .
 
 RUN npm run build
 
-# ───── STAGE 2: production ─────
+# ===== STAGE 2: production =====
 FROM node:20-alpine
 
 ENV NODE_ENV=production
@@ -19,8 +19,10 @@ ENV NODE_ENV=production
 WORKDIR /app
 
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 
-# default: запускається API
-CMD ["node", "dist/main.worker.js"]
+# Встановлюємо лише продакшн-залежності
+RUN npm ci --omit=dev
+
+# За замовчуванням запускає головного worker (можна перевизначити в compose)
+CMD ["node", "dist/rabbitmq.subscription-confirmation.js"]

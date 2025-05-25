@@ -23,8 +23,13 @@ export interface AppConfig {
     REDIS_PASSWORD: string;
   };
 
+  rabbitmq: {
+    RABBITMQ_HOST: string;
+    RABBITMQ_USER: string;
+    RABBITMQ_PASSWORD: string;
+  };
+
   app: {
     API_URL: string;
-    BULL_BOARD_PASSWORD: string;
   };
 }
