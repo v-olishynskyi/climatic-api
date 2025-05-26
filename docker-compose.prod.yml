@@ -4,7 +4,7 @@ services:
   api:
     build:
       context: .
-      dockerfile: Dockerfile_prod
+      dockerfile: Dockerfile
     container_name: climatic_api_prod
     restart: always
     ports:
