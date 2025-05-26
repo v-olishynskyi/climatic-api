@@ -18,13 +18,13 @@ services:
       - rabbitmq
 
   redis:
-    image: redis
+    image: redis:7
     container_name: climatic_redis_dev
     ports:
       - '6379:6379'
 
   rabbitmq:
-    image: rabbitmq:3-management
+    image: rabbitmq:3.13-management
     container_name: climatic_rabbitmq_dev
     ports:
       - '5672:5672'
