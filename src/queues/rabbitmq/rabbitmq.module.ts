@@ -20,7 +20,7 @@ import { WeatherQueueDispatcher } from './weather-update-mail/weather-queue-disp
         useFactory: () => ({
           transport: Transport.RMQ,
           options: {
-            urls: ['amqp://guest:guest@rabbitmq:5672'],
+            urls: [process.env.RABBITMQ_URL!],
             queue: QueueNamesEnum.SUBSCRIPTION_CONFIRMATION_MAIL_QUEUE,
             queueOptions: { durable: true },
           },
@@ -31,7 +31,7 @@ import { WeatherQueueDispatcher } from './weather-update-mail/weather-queue-disp
         useFactory: () => ({
           transport: Transport.RMQ,
           options: {
-            urls: ['amqp://guest:guest@rabbitmq:5672'],
+            urls: [process.env.RABBITMQ_URL!],
             queue: QueueNamesEnum.WEATHER_UPDATE_HOURLY_MAIL_QUEUE,
             queueOptions: { durable: true },
           },
@@ -42,7 +42,7 @@ import { WeatherQueueDispatcher } from './weather-update-mail/weather-queue-disp
         useFactory: () => ({
           transport: Transport.RMQ,
           options: {
-            urls: ['amqp://guest:guest@rabbitmq:5672'],
+            urls: [process.env.RABBITMQ_URL!],
             queue: QueueNamesEnum.WEATHER_UPDATE_DAILY_MAIL_QUEUE,
             queueOptions: { durable: true },
           },
