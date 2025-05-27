@@ -1,20 +1,17 @@
 import { NestFactory } from '@nestjs/core';
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { MicroserviceOptions } from '@nestjs/microservices';
 import { RabbitMQModule } from './queues/rabbitmq/rabbitmq.module';
 import { QueueNamesEnum } from './queues/rabbitmq/enum';
+import RabbitMQFactory from './queues/rabbitmq/factory/rabbitmq.factory';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     RabbitMQModule,
-    {
-      transport: Transport.RMQ,
-      options: {
-        urls: [process.env.RABBITMQ_URL!],
-        queue: QueueNamesEnum.WEATHER_UPDATE_DAILY_MAIL_QUEUE,
-        queueOptions: { durable: true },
-      },
-    },
+    RabbitMQFactory.createRabbitMQClient(
+      QueueNamesEnum.WEATHER_UPDATE_DAILY_MAIL_QUEUE,
+    ),
   );
+  console.log('Starting Weather Update Daily Mail Microservice...');
 
   await app.listen();
 }

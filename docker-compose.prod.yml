@@ -14,6 +14,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+      rabbitmq:
+        condition: service_healthy
     env_file:
       - .env.prod
     environment:
@@ -21,10 +23,10 @@ services:
 
   postgres:
     image: postgres:15
-    container_name: climatic_db_prod
+    container_name: climatic_postgres_prod
     restart: always
     ports:
-      - '5432:5432'
+      - '5432:5432' # ❗️Вимкни в production, якщо не потрібно зовні
     env_file:
       - .env.prod
     volumes:
@@ -40,7 +42,7 @@ services:
     container_name: climatic_redis_prod
     restart: always
     ports:
-      - '6379:6379'
+      - '6379:6379' # ❗️Вимкни в production, якщо не потрібно зовні
     env_file:
       - .env.prod
     volumes:
@@ -48,7 +50,8 @@ services:
 
   rabbitmq:
     image: rabbitmq:3.13-management
-    restart: unless-stopped
+    container_name: climatic_rabbitmq_prod
+    restart: always
     ports:
       - '5672:5672' # AMQP
       - '15672:15672' # Web UI
@@ -56,36 +59,56 @@ services:
       - .env.prod
     volumes:
       - rabbitmqdata_prod:/var/lib/rabbitmq
+    healthcheck:
+      test: ['CMD', 'rabbitmq-diagnostics', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  # Мікросервіс підтвердження підписки
   subscription_confirmation_worker:
-    container_name: subscription_confirmation_worker
+    container_name: climatic_subscription_confirmation_worker_prod
     build:
       context: .
       dockerfile: Dockerfile_worker
     command: ['node', 'dist/rabbitmq.subscription-confirmation.main.js']
+    restart: always
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
+    env_file:
+      - .env.prod
+    environment:
+      NODE_ENV: production
 
-  # Мікросервіс для щоденної розсилки
   weather_daily_worker:
-    container_name: weather_daily_worker
+    container_name: climatic_weather_daily_worker_prod
     build:
       context: .
       dockerfile: Dockerfile_worker
     command: ['node', 'dist/rabbitmq.weather-daily.main.js']
+    restart: always
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
+    env_file:
+      - .env.prod
+    environment:
+      NODE_ENV: production
 
-  # Мікросервіс для погодинної розсилки
   weather_hourly_worker:
-    container_name: weather_hourly_worker
+    container_name: climatic_weather_hourly_worker_prod
     build:
       context: .
       dockerfile: Dockerfile_worker
     command: ['node', 'dist/rabbitmq.weather-hourly.main.js']
+    restart: always
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
+    env_file:
+      - .env.prod
+    environment:
+      NODE_ENV: production
 
 volumes:
   pg_data_prod:

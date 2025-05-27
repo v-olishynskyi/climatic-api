@@ -22,13 +22,8 @@ services:
     container_name: climatic_redis_dev
     ports:
       - '6379:6379'
-
-  rabbitmq:
-    image: rabbitmq:3.13-management
-    container_name: climatic_rabbitmq_dev
-    ports:
-      - '5672:5672'
-      - '15672:15672'
+    volumes:
+      - redis_data:/data
 
   postgres:
     image: postgres:15
@@ -41,12 +36,52 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - pg_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: climatic_rabbitmq_dev
+    ports:
+      - '5672:5672' # AMQP
+      - '15672:15672' # Web UI
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  subscription_confirmation_worker:
+    container_name: subscription_confirmation_worker_dev
+    build:
+      context: .
+      dockerfile: Dockerfile_worker
+    command: ['node', 'dist/rabbitmq.subscription-confirmation.main.js']
+    depends_on:
+      - rabbitmq
+    env_file:
+      - .env
+
+  weather_daily_worker:
+    container_name: weather_daily_worker_dev
+    build:
+      context: .
+      dockerfile: Dockerfile_worker
+    command: ['node', 'dist/rabbitmq.weather-daily.main.js']
+    depends_on:
+      - rabbitmq
+    env_file:
+      - .env
+
+  weather_hourly_worker:
+    container_name: weather_hourly_worker_dev
+    build:
+      context: .
+      dockerfile: Dockerfile_worker
+    command: ['node', 'dist/rabbitmq.weather-hourly.main.js']
+    depends_on:
+      - rabbitmq
+    env_file:
+      - .env
 
 volumes:
   pg_data:
-  redis:
-    driver: local
-  rabbitmqdata:
-    driver: local
+  redis_data:
+  rabbitmq_data:
