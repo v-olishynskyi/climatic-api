@@ -19,6 +19,10 @@ async function bootstrap() {
 
   app.setViewEngine('ejs');
 
-  await app.listen(3000);
+  if (process.env.NODE_ENV === 'development') {
+    await app.listen(3000);
+  } else {
+    await app.listen(3000, '0.0.0.0');
+  }
 }
 bootstrap();
