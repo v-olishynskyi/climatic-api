@@ -17,23 +17,29 @@ import RabbitMQFactory from './factory/rabbitmq.factory';
     MailModule,
     ClientsModule.registerAsync([
       {
-        name: ClientNames.SUBSCRIPTION_CONFIRMATION_MAIL,
+        name: RabbitMQFactory.resolveClientName(
+          ClientNames.SUBSCRIPTION_CONFIRMATION_MAIL,
+        ),
         useFactory: () =>
-          RabbitMQFactory.createRabbitMQClient(
+          RabbitMQFactory.createRabbitMQClientOptions(
             QueueNamesEnum.SUBSCRIPTION_CONFIRMATION_MAIL_QUEUE,
           ),
       },
       {
-        name: ClientNames.WEATHER_UPDATE_HOURLY_MAIL,
+        name: RabbitMQFactory.resolveClientName(
+          ClientNames.WEATHER_UPDATE_HOURLY_MAIL,
+        ),
         useFactory: () =>
-          RabbitMQFactory.createRabbitMQClient(
+          RabbitMQFactory.createRabbitMQClientOptions(
             QueueNamesEnum.WEATHER_UPDATE_HOURLY_MAIL_QUEUE,
           ),
       },
       {
-        name: ClientNames.WEATHER_UPDATE_DAILY_MAIL,
+        name: RabbitMQFactory.resolveClientName(
+          ClientNames.WEATHER_UPDATE_DAILY_MAIL,
+        ),
         useFactory: () =>
-          RabbitMQFactory.createRabbitMQClient(
+          RabbitMQFactory.createRabbitMQClientOptions(
             QueueNamesEnum.WEATHER_UPDATE_DAILY_MAIL_QUEUE,
           ),
       },

@@ -7,7 +7,7 @@ import RabbitMQFactory from './queues/rabbitmq/factory/rabbitmq.factory';
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     RabbitMQModule,
-    RabbitMQFactory.createRabbitMQClient(
+    RabbitMQFactory.createRabbitMQClientOptions(
       QueueNamesEnum.SUBSCRIPTION_CONFIRMATION_MAIL_QUEUE,
     ),
   );

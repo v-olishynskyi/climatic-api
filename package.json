@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build && cp -r views dist/views",
+    "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:worker": "node dist/main.worker.js",
@@ -27,12 +27,8 @@
     "migration:revert:prod": "npx typeorm migration:revert -d dist/infrastructure/database/typeorm.config.js"
   },
   "dependencies": {
-    "@bull-board/api": "^6.9.6",
-    "@bull-board/express": "^6.9.6",
-    "@bull-board/nestjs": "^6.9.6",
     "@nestjs-modules/mailer": "^2.0.2",
     "@nestjs/axios": "^4.0.0",
-    "@nestjs/bullmq": "^11.0.2",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
@@ -46,7 +42,6 @@
     "amqp-connection-manager": "^4.1.14",
     "amqplib": "^0.10.8",
     "axios": "^1.9.0",
-    "bullmq": "^5.52.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
     "cron": "^4.3.0",

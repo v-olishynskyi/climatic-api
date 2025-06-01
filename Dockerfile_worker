@@ -1,7 +1,7 @@
 # ===== STAGE 1: build =====
 FROM node:20-alpine AS builder
 
-WORKDIR /app
+WORKDIR /var/www/application
 
 COPY package*.json ./
 
@@ -16,11 +16,12 @@ FROM node:20-alpine
 
 ENV NODE_ENV=production
 
-WORKDIR /app
+WORKDIR /var/www/application
 
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/package-lock.json ./package-lock.json
+COPY --from=builder /var/www/application/dist ./dist
+COPY --from=builder /var/www/application/package.json ./package.json
+COPY --from=builder /var/www/application/package-lock.json ./package-lock.json
+COPY --from=builder /var/www/application/src/infrastructure/mail/templates ./src/infrastructure/mail/templates
 
 # Встановлюємо лише продакшн-залежності
 RUN npm ci --omit=dev

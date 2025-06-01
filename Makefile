@@ -37,10 +37,10 @@ prod-sh:
 	docker-compose -f docker-compose.prod.yml exec api sh
 
 ### === Helpers ===
-restart-dev:
+dev-restart:
 	make dev-down && make dev-up
 
-restart-prod:
+prod-restart:
 	make prod-down && make prod-up
 
 # Встановлення пакета всередині контейнера: make install name=назва

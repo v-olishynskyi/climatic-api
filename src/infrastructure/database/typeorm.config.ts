@@ -18,6 +18,12 @@ export const AppDataSource = new DataSource({
   database: process.env.POSTGRES_DB,
   synchronize: false, // завжди false для прод
   logging: NODE_ENV !== 'production',
+  ssl: true,
+  extra: {
+    ssl: {
+      rejectUnauthorized: false,
+    },
+  },
 
   // .ts файли у dev, .js файли у прод
   entities: [

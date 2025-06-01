@@ -11,6 +11,8 @@ const templatesDir =
     ? join(__dirname, 'templates') // dist/infrastructure/mail/templates
     : join(process.cwd(), 'src/infrastructure/mail/templates'); // dev-режим
 
+const FROM_TITLE =
+  process.env.NODE_ENV === 'production' ? 'Climatic' : 'Climatic Dev';
 @Module({
   imports: [
     MailerModule.forRootAsync({
@@ -26,7 +28,7 @@ const templatesDir =
           },
         },
         defaults: {
-          from: `"Climatic" <${configService.get('MAIL_FROM')}>`,
+          from: `"${FROM_TITLE}" <${configService.get('MAIL_FROM')}>`,
         },
         template: {
           dir: templatesDir,

@@ -7,6 +7,11 @@ export default class RabbitMQFactory {
     return `${baseName}${suffix}`;
   }
 
+  static resolveClientName(baseName: string): string {
+    const suffix = process.env.NODE_ENV === 'development' ? '_dev' : '';
+    return `${baseName}${suffix}`;
+  }
+
   static createRabbitMQUrl() {
     return {
       hostname: process.env.RABBITMQ_HOST,
@@ -20,7 +25,7 @@ export default class RabbitMQFactory {
     };
   }
 
-  static createRabbitMQClient(
+  static createRabbitMQClientOptions(
     queueName: QueueNamesEnum,
     restOptions?: Omit<RmqOptions, 'transport'>,
   ): RmqOptions {

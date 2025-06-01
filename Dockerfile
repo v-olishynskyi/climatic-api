@@ -1,7 +1,7 @@
 # ───── STAGE 1: build ─────
 FROM node:20-alpine AS builder
 
-WORKDIR /app
+WORKDIR /var/www/application
 
 COPY package*.json ./
 
@@ -16,18 +16,19 @@ FROM node:20-alpine
 
 ENV NODE_ENV=production
 
-WORKDIR /app
+WORKDIR /var/www/application
 
 RUN apk add --no-cache postgresql-client
 
-# Копіюємо лише необхідне для запуску
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
+# Копіюємо з builder лише необхідне для запуску
+COPY --from=builder /var/www/application/dist ./dist
+COPY --from=builder /var/www/application/node_modules ./node_modules
+COPY --from=builder /var/www/application/package.json ./package.json
+COPY --from=builder /var/www/application/src/views ./dist/views
 
 # TypeORM config + migration scripts
-COPY --from=builder /app/tsconfig.build.json ./tsconfig.build.json
-COPY --from=builder /app/src/infrastructure/database ./src/infrastructure/database
+COPY --from=builder /var/www/application/tsconfig.build.json ./tsconfig.build.json
+COPY --from=builder /var/www/application/src/infrastructure/database ./src/infrastructure/database
 
 # Копіюємо entrypoint.sh
 COPY entrypoint.sh .

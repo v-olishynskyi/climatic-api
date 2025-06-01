@@ -3,11 +3,16 @@ import { ClientProxy } from '@nestjs/microservices';
 import { Inject, Injectable } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { Subscription } from '../../../modules/subscription/entities/subsciption.entity';
+import RabbitMQFactory from '../factory/rabbitmq.factory';
 
 @Injectable()
 export class SubscriptionConfirmationMailService {
   constructor(
-    @Inject(ClientNames.SUBSCRIPTION_CONFIRMATION_MAIL)
+    @Inject(
+      RabbitMQFactory.resolveClientName(
+        ClientNames.SUBSCRIPTION_CONFIRMATION_MAIL,
+      ),
+    )
     private readonly client: ClientProxy,
   ) {}
 

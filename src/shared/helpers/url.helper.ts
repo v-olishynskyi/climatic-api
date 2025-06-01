@@ -12,7 +12,6 @@ export function generateUnsubscribeUrl(token: string): string {
 
 export function generateConfirmUrl(token: string): string {
   const baseUrl = process.env.BASE_URL;
-
   return `${baseUrl}/confirm/${token}`;
 }
 

@@ -22,6 +22,12 @@ import { AppConfigModule } from '../../config/config.module';
         synchronize: process.env.NODE_ENV !== 'production',
         autoLoadEntities: true,
         logging: true,
+        ssl: true,
+        extra: {
+          ssl: {
+            rejectUnauthorized: false,
+          },
+        },
       }),
     }),
   ],
