@@ -12,7 +12,7 @@ export class WeatherUpdateDailyMailConsumer {
   constructor(private readonly mailService: MailService) {}
 
   @EventPattern(QueueEventsEnum.WEATHER_UPDATE_DAILY_MAIL)
-  async handleSubscriptionConfirmationMail(data: WeatherUpdateMailData) {
+  async handleUpdateWeatherDailyMail(data: WeatherUpdateMailData) {
     await this.mailService.sendEmail(
       this.mailFactory.createWeatherUpdateMail(data.subscription, data.weather),
     );
