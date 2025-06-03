@@ -24,7 +24,8 @@
     "migration:run": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d src/infrastructure/database/typeorm.config.ts",
     "migration:revert": "npm run typeorm migration:revert -d src/infrastructure/database/typeorm.config.ts",
     "migration:run:prod": "npx typeorm migration:run -d dist/infrastructure/database/typeorm.config.js",
-    "migration:revert:prod": "npx typeorm migration:revert -d dist/infrastructure/database/typeorm.config.js"
+    "migration:revert:prod": "npx typeorm migration:revert -d dist/infrastructure/database/typeorm.config.js",
+    "seed": "ts-node -r tsconfig-paths/register ./src/infrastructure/database/seed.ts"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^2.0.2",
@@ -52,7 +53,8 @@
     "pg": "^8.16.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "typeorm": "^0.3.24"
+    "typeorm": "^0.3.24",
+    "typeorm-extension": "^3.7.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

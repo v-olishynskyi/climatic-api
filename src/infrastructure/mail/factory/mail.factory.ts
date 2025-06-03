@@ -1,10 +1,10 @@
 import { ISendMailOptions } from '@nestjs-modules/mailer';
+import { Subscription } from '../../../modules/subscription/entities/subsciption.entity';
+import { WeatherByCityDto } from '../../weather/dto/get-weather.dto';
 import {
   generateConfirmUrl,
   generateUnsubscribeUrl,
-} from '../../../shared/helpers/url.helper';
-import { Subscription } from '../../../modules/subscription/entities/subsciption.entity';
-import { WeatherByCityDto } from '../../weather/dto/get-weather.dto';
+} from '../../../shared/helpers';
 
 export class MailFactory {
   private readonly TEMPLATE = {

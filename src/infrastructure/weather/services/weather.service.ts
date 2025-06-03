@@ -12,7 +12,7 @@ import {
   WeatherByCityDto,
 } from '../dto/get-weather.dto';
 import { AxiosError } from 'axios';
-import { generateWeatherUrl } from '../../../shared/helpers/url.helper';
+import { generateWeatherUrl } from '../../../shared/helpers';
 import { WeatherCacheService } from './weather.cache.service';
 
 @Injectable()
@@ -52,7 +52,7 @@ export class WeatherService {
         const axiosError = error as AxiosError<WeatherApiError>;
 
         if (axiosError.response?.data.error.code === 1006) {
-          throw new NotFoundException('City not found');
+          throw new NotFoundException(`City ${city} not found`);
         }
       }
 

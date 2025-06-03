@@ -1,16 +1,13 @@
-import { createHash } from 'crypto';
 import { SubscribeWeatherUpdatesDto } from '../dto';
 import { Subscription } from '../entities/subsciption.entity';
 import { DeepPartial } from 'typeorm';
+import { generateSubscriptionToken } from '../../../shared/helpers';
 
 export class SubscriptionFactory {
   static createSubscription(
     inputDto: SubscribeWeatherUpdatesDto,
   ): DeepPartial<Subscription> {
-    // generate token for subscription
-    const payloadString = `${inputDto.email}${new Date().getTime()}`;
-    const hash = createHash('sha256');
-    const subscriptionToken = hash.update(payloadString).digest('hex');
+    const subscriptionToken = generateSubscriptionToken(inputDto.email);
 
     return {
       email: inputDto.email,
